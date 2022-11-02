@@ -3,16 +3,16 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:28678",
-      "sslPort": 44373
+      "applicationUrl": "http://localhost:20422",
+      "sslPort": 44347
     }
   },
   "profiles": {
-    "RemoteFrontend": {
+    "RemoteMessenger.Client": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7083;http://localhost:5284",
+      "applicationUrl": "https://localhost:7245;http://localhost:5037",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

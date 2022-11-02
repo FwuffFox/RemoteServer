@@ -7,17 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.10" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Pages\GeneralChat.razor.css">
-        <DependentUpon>GeneralChat.razor</DependentUpon>
-      </None>
     </ItemGroup>
 
 </Project>
