@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Pages\GeneralChat.razor.css">
+        <DependentUpon>GeneralChat.razor</DependentUpon>
+      </None>
+    </ItemGroup>
+
+</Project>

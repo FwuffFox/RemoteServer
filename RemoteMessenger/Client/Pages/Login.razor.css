@@ -1,0 +1,159 @@
+﻿*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 620;
+    line-height: 1.5;
+    color: #000000;
+    background-color: #F2D0A9;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+h1 {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+
+.text-field {
+    margin-bottom: 1rem;
+}
+
+.text-field__label {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.text-field__input {
+    display: block;
+    width: 100%;
+    height: calc(2.25rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #000000;
+    background-clip: padding-box;
+    border: 1px solid #bdbdbd;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+    .text-field__input::placeholder {
+        <!-- background-color: #212529;
+        opacity: 0.4; -->
+    }
+
+    .text-field__input:focus {
+        border-color: #bdbdbd;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(158, 158, 158, 0.25);
+    }
+
+.text-field_floating {
+    position: relative;
+}
+
+    .text-field_floating .text-field__input {
+        background-color: #cFaF8F;
+        height: calc(3.5rem + 2px);
+        line-height: 1.25;
+        padding: 1rem 0.75rem;
+    }
+
+    .text-field_floating .text-field__label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        padding: 1rem .75rem;
+        pointer-events: none;
+        border: 1px solid transparent;
+        transform-origin: 0 0;
+        transition: opacity .15s ease-in-out, transform .15s ease-in-out;
+    }
+
+    .text-field_floating .text-field__input::-moz-placeholder {
+        color: transparent;
+    }
+
+    .text-field_floating .text-field__input::placeholder {
+        color: transparent;
+    }
+
+    .text-field_floating .text-field__input:focus,
+    .text-field_floating .text-field__input:not(:placeholder-shown) {
+        padding-top: 1.625rem;
+        padding-bottom: .625rem;
+    }
+
+        .text-field_floating .text-field__input:focus ~ .text-field__label,
+        .text-field_floating .text-field__input:not(:placeholder-shown) ~ .text-field__label {
+            opacity: 0.75;
+            transform: scale(.85) translateY(-.75rem) translateX(.15rem);
+        }
+
+#buttons {
+    text-align: center;
+    background: #F58634;
+    -webkit-border-radius: 100px / 60px;
+    -moz-border-radius: 100px / 60px;
+    border-radius: 100px;
+    border: 3px solid #a1541d;
+    width: calc( (100vw - 480px) / (1600 - 480) * (200 - 160) + 160px );
+    height: calc(( (100vw - 480px) / (1600 - 480) * (200 - 160) + 160px ) / 4)
+}
+
+.link_button {
+    display: inline-block;
+    margin-left: 50%;
+    margin-top: 2.25rem;
+    transform: translate(-50%, -50%);
+}
+
+.img_buttons {
+    text-decoration: none;
+    color: #000000;
+}
+
+    .img_buttons:hover {
+        text-decoration: none;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .img_buttons:active {
+        text-decoration: none;
+        color: #00ff00;
+    }
+
+.text_buttons {
+    font-size: 1.2rem;
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#background {
+    opacity: 0.5;
+    z-index: -1;
+    height: 21.2rem;
+    width: 140%;
+    position: absolute;
+    top: -11rem;
+    left: -20%;
+    background: #FF9900;
+    border-radius: 0 0 30% 80%;
+}

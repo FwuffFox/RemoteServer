@@ -1,0 +1,7 @@
+bin/
+obj/
+/packages/
+generated_files/
+Migrations/
+riderModule.iml
+/_ReSharper.Caches/

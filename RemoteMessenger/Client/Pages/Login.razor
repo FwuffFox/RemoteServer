@@ -1,0 +1,114 @@
+﻿@page "/login";
+@using System.Net;
+@using System.Security.Claims;
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Identity
+@layout Shared.Layouts.EmptyLayout;
+@inject ILogger<Login> Logger;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
+@inject IHttpContextAccessor HttpContextAccessor;
+<PageTitle>Login</PageTitle>
+
+<div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">	
+			
+	<div id="background" />
+	
+	<img src="Icon.png" width="100%">
+	
+	<EditForm Model="@_loginValidationModel" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+		<DataAnnotationsValidator />
+		<div class="text-field text-field_floating">
+			<input tabindex="1" class="text-field__input" type="text" id="username" placeholder=" "
+			       @bind-value="@_loginValidationModel.Username" />
+			<label class="text-field__label" for="username">Тег Пользователя</label>
+			<ValidationMessage For="@(() => _loginValidationModel.Username)" />
+		</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="2" class="text-field__input" type="password" id="password" name="password" placeholder=" "
+			       @bind-value="@_loginValidationModel.Password" />
+			<label class="text-field__label" for="password">Пароль</label>
+			<ValidationMessage For="@(() => _loginValidationModel.Password)" />
+		</div>
+		<div class="link_button center_vertical">
+			<button tabindex="3" class="img_buttons" type="submit">
+				<div id="buttons">
+					<div class="text_buttons">Войти</div>
+				</div>
+			</button>
+		</div>
+		@if (true) {}
+	</EditForm>
+	
+	
+
+<button @onclick="LogUsername">Log username</button>
+
+<p>@authMessage</p>
+
+
+</div>
+
+@code {
+	private readonly LoginValidationModel _loginValidationModel = new();
+	private string _loginErrorMessage;
+	private bool isError;
+	
+	[CascadingParameter]
+	private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+	private void HandleInvalidSubmit()
+	{
+		Logger.LogDebug("Handled invalid submit");
+	}
+
+	private async void HandleValidSubmit()
+	{
+		//var result = await Server.ServerConnection!.GetAsync("login");
+		/* if (!result.IsSuccessStatusCode)
+		{
+			isError = true;
+			if (result.StatusCode == HttpStatusCode.Forbidden)
+				_loginErrorMessage = "Неверный пароль или имя пользователя";
+			
+			return;
+		} */
+		Authorize();
+	}
+
+	private async void Authorize()
+	{
+		// TODO: Authorization logic
+		var claims = new List<Claim> { new(ClaimTypes.Name, _loginValidationModel.Username) };
+		var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+		await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+			new ClaimsPrincipal(claimsIdentity)).ContinueWith(p => NavigationManager.NavigateTo("/"));
+	}
+	
+	private class LoginValidationModel 
+	{
+		[Required(ErrorMessage = "Требуется имя пользователя @example")]
+		public string? Username {get; set;}
+
+		[Required(ErrorMessage = "Требуется пароль")]
+		[DataType(DataType.Password)]
+		public string? Password {get; set;}
+	}
+	
+	private string authMessage;
+
+	private async Task LogUsername()
+	{
+		var authState = await authenticationStateTask;
+		var user = authState.User;
+		if (user.Identity.IsAuthenticated)
+		{
+			authMessage = $"{user.Identity.Name} is authenticated.";
+		}
+		else
+		{
+			authMessage = "The user is NOT authenticated.";
+		}
+	}
+}
