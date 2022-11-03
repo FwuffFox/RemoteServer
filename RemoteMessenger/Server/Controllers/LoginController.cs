@@ -1,12 +1,14 @@
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/login")]
 public class LoginController : ControllerBase
 {
 
@@ -19,37 +21,23 @@ public class LoginController : ControllerBase
         _logger = logger;
     }
 
-    public struct LoginForm
+    [HttpPost(Name = "Login")]
+    public async Task<ActionResult<string>> Login(LoginUserDto request)
     {
-        public string Username { get; set; }
-        public string RsaEncryptedPassword { get; set; }
+        var userByUsername = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
+        if (userByUsername is null) return BadRequest($"User {request.Username} was not found");
+        if (!await VerifyPasswordHash(request.Password, userByUsername.PasswordHash, userByUsername.PasswordSalt))
+            return BadRequest("Password is wrong");
+        return Ok("Token there");
+    }
+
+    private async Task<bool> VerifyPasswordHash(string password, byte[] passHash, byte[] passSalt)
+    {
+        using var hmac = new HMACSHA512(passSalt);
+        var passStream = new MemoryStream(Encoding.UTF8.GetBytes(password));
+        var computeHash = await hmac.ComputeHashAsync(passStream);
+        return computeHash.SequenceEqual(passHash);
     }
     
-    [HttpPost(Name = "Login")]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Post(LoginForm form)
-    {
-        var username = form.Username.ToLower();
-        if (!RSAEncryption.TryDecrypt_Bytes(form.RsaEncryptedPassword, out var decryptedBytes))
-        {
-            return BadRequest("Couldn't decrypt password");
-        }
-        using var sha = SHA256.Create();
-        var hashedPasswordBytes = sha.ComputeHash(decryptedBytes);
-        var hashedPassword = Convert.ToBase64String(hashedPasswordBytes);
-
-        var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == username 
-                                                                    && user.HashedPassword == hashedPassword);
-        
-        if (user is null)
-        {
-            return Forbid();
-        }
-
-        var guid = new Guid();
-        Response.Cookies.Append("session-id", guid.ToString());
-        return Ok();
-    }
+    
 }

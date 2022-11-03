@@ -1,15 +1,11 @@
 ﻿@page "/login";
-@using System.Net;
-@using System.Security.Claims;
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authentication.Cookies
-@using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
+@using Blazored.LocalStorage
 @layout Shared.Layouts.EmptyLayout;
 @inject ILogger<Login> Logger;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
-@inject IHttpContextAccessor HttpContextAccessor;
+@inject HttpClient Http;
 <PageTitle>Login</PageTitle>
 
 <div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">	
@@ -64,27 +60,9 @@
 		Logger.LogDebug("Handled invalid submit");
 	}
 
-	private async void HandleValidSubmit()
+	private async Task HandleValidSubmit()
 	{
-		//var result = await Server.ServerConnection!.GetAsync("login");
-		/* if (!result.IsSuccessStatusCode)
-		{
-			isError = true;
-			if (result.StatusCode == HttpStatusCode.Forbidden)
-				_loginErrorMessage = "Неверный пароль или имя пользователя";
-			
-			return;
-		} */
-		Authorize();
-	}
-
-	private async void Authorize()
-	{
-		// TODO: Authorization logic
-		var claims = new List<Claim> { new(ClaimTypes.Name, _loginValidationModel.Username) };
-		var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-		await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-			new ClaimsPrincipal(claimsIdentity)).ContinueWith(p => NavigationManager.NavigateTo("/"));
+		// TODO: Login logic
 	}
 	
 	private class LoginValidationModel 
