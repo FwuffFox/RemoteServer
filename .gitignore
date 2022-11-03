@@ -5,3 +5,8 @@ generated_files/
 Migrations/
 riderModule.iml
 /_ReSharper.Caches/
+*.db
+*.db-shm
+*.db-wal
+.idea/
+.vs/

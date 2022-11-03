@@ -12,8 +12,8 @@ namespace RemoteMessenger.Server.Controllers;
 public class LoginController : ControllerBase
 {
 
-    private ILogger<LoginController> _logger;
-    private MessengerContext _context;
+    private readonly ILogger<LoginController> _logger;
+    private readonly MessengerContext _context;
 
     public LoginController(MessengerContext context, ILogger<LoginController> logger)
     {
@@ -28,6 +28,7 @@ public class LoginController : ControllerBase
         if (userByUsername is null) return BadRequest($"User {request.Username} was not found");
         if (!await VerifyPasswordHash(request.Password, userByUsername.PasswordHash, userByUsername.PasswordSalt))
             return BadRequest("Password is wrong");
+        _logger.LogInformation($"{userByUsername.Username} with id {userByUsername.Id} have logged in.");
         return Ok("Token there");
     }
 
