@@ -1,16 +1,10 @@
 namespace RemoteMessenger.Shared;
 
-public class RegisterUserDto
+public class RegisterUserDto : UserBaseDto
 {
     public string RegistrationCode { get; set; } = string.Empty;
-    
-    private string _username = string.Empty;
 
-    public string Username
-    {
-        get => _username;
-        set => _username = value.ToLower();
-    }
-    
-    public string Password { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+
+    public string JobTitle { get; set; } = string.Empty;
 }

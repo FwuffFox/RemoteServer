@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 using RemoteMessenger.Server;
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Server.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +28,10 @@ app.MapControllers();
 app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
 app.MapGet("/encrypt/{encryptedString}",
     RSAEncryption.Decrypt_Base64);
+app.MapGet("/validate_jwt/{jwt}",
+    async (string jwt, HttpContext context) => await JwtTokenManager.ValidateToken(jwt, context.GetRequestBaseUrl()));
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 
 RSAEncryption.Initialize();
-
+JwtTokenManager.Initialize(builder.Configuration.GetSection("AppSettings:Token").Value);
 app.Run();
