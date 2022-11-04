@@ -1,4 +1,5 @@
-using RemoteMessenger.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Util;
 
@@ -13,6 +14,21 @@ var connectionString = builder.Configuration.GetConnectionString("Database") ?? 
 builder.Services.AddDbContext<MessengerContext>(op => op.UseSqlite(connectionString));
 builder.Services.AddSignalR();
 
+// Initialize JwtTokenManager
+JwtTokenManager.Initialize(
+    secret: builder.Configuration.GetSection("Jwt:Secret").Value,
+    expireDays: builder.Configuration.GetValue<int>("Jwt:ExpireDays"),
+    issuer: builder.Configuration.GetSection("Jwt:Issuer").Value,
+    audience: builder.Configuration.GetSection("Jwt:Audience").Value
+    );
+RSAEncryption.Initialize();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = JwtTokenManager.TokenValidationParameters!;
+});
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,7 +39,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
 app.MapGet("/encrypt/{encryptedString}",
@@ -34,8 +51,7 @@ app.MapGet("/validate_jwt/{jwt}",
         var res = await JwtTokenManager.ValidateToken(jwt, context.GetRequestBaseUrl());
         return res.IsValid;
     });
+app.MapGet("/check_auth", [Authorize](HttpContext context) => "Authenticated");
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 
-RSAEncryption.Initialize();
-JwtTokenManager.Initialize(builder.Configuration.GetSection("AppSettings:Token").Value);
 app.Run();

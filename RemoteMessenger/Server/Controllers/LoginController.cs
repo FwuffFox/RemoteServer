@@ -30,8 +30,10 @@ public class LoginController : ControllerBase
         if (user is null) return BadRequest($"User {request.Username} was not found");
         if (!await VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             return BadRequest("Password is wrong");
-        _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.");
-        return Ok(CreateToken(user));
+        
+        var token = await JwtTokenManager.IssueToken(user);
+        _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.\n Token: {token}");
+        return Ok(token);
     }
 
     private async Task<bool> VerifyPasswordHash(string password, byte[] passHash, byte[] passSalt)
@@ -40,23 +42,5 @@ public class LoginController : ControllerBase
         var passStream = new MemoryStream(Encoding.UTF8.GetBytes(password));
         var computeHash = await hmac.ComputeHashAsync(passStream);
         return computeHash.SequenceEqual(passHash);
-    }
-
-    private async Task<string> CreateToken(User user)
-    {
-        var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Name, user.FullName),
-            new(JwtRegisteredClaimNames.UniqueName, user.Username)
-        };
-        var key = JwtTokenManager.Key;
-        var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        var token = new JwtSecurityToken(
-            $"{Request.Scheme}://{Request.Host}",
-            claims: claims,
-            expires: DateTime.Now.AddDays(14),
-            signingCredentials: signingCredentials);
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        return jwt;
     }
 }

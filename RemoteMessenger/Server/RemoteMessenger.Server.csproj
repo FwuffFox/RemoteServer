@@ -7,23 +7,24 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10"/>
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="generated_files"/>
-        <Folder Include="Migrations"/>
+        <Folder Include="generated_files" />
+        <Folder Include="Migrations" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shared\RemoteMessenger.Shared.csproj"/>
+        <ProjectReference Include="..\Shared\RemoteMessenger.Shared.csproj" />
     </ItemGroup>
 
 </Project>
