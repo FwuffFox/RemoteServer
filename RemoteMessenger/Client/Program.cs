@@ -11,6 +11,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, MessengerStateProvider>();
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<Server>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

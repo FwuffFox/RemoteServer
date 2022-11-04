@@ -19,9 +19,9 @@ public class RegisterController : ControllerBase
     }
 
     [HttpPost(Name = "RegisterUser")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Create(RegisterUserDto request)
+    public async Task<ActionResult<string>> Create(RegisterUserDto request)
     {
         var isUsernameTaken = await _context.Users.AnyAsync(user => user.Username == request.Username);
         if (isUsernameTaken) return BadRequest($"Username {request.Username} is taken");
