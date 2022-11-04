@@ -22,9 +22,17 @@ public sealed class User
     
     public string FullName { get; set; } = string.Empty;
 
-    private string _gender = string.Empty;
-
     public string JobTitle { get; set; } = string.Empty;
+    
+    private string _role = string.Empty;
+    
+    public string Role
+    {
+        get => _role;
+        set => _role = value is Roles.Admin ? value : Roles.User;
+    }
+    
+    private string _gender = string.Empty;
     
     public string Gender
     {
@@ -37,8 +45,6 @@ public sealed class User
     }
     
     public string DateOfBirth { get; set; } = string.Empty;
-
-
 
     public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
 

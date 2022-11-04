@@ -21,13 +21,14 @@ public class RegisterController : ControllerBase
     [HttpPost(Name = "RegisterUser")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Create(RegisterUserDto request)
+    public async Task<ActionResult<string>> Register(RegisterUserDto request)
     {
         var isUsernameTaken = await _context.Users.AnyAsync(user => user.Username == request.Username);
         if (isUsernameTaken) return BadRequest($"Username {request.Username} is taken");
-        var requestCode = await _context.RegisterCodes.FirstOrDefaultAsync(
+        
+        var registerCode = await _context.RegisterCodes.FirstOrDefaultAsync(
             code => request.RegistrationCode == code.Code);
-        if (requestCode is null) return BadRequest("Registration code doesn't exist");
+        if (registerCode is null) return BadRequest("Registration code doesn't exist");
 
         var hashSalt = await CreatePasswordHash(request.Password);
         var user = new User
@@ -35,19 +36,22 @@ public class RegisterController : ControllerBase
             Username = request.Username.ToLower(),
             FullName = request.FullName,
             JobTitle = request.JobTitle,
+            Role = registerCode.Role,
             Gender = request.Gender,
             DateOfBirth = request.DateOfBirth,
             PasswordHash = hashSalt.Hash,
             PasswordSalt = hashSalt.Salt
         };
-        _context.RegisterCodes.Remove(requestCode);
+        
+        _context.RegisterCodes.Remove(registerCode);
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+        
         _logger.LogInformation($"{user.Username} was registered by code: {request.RegistrationCode}");
         return Ok("User was registered");
     }
     
-    private async Task<HashSalt> CreatePasswordHash(string password)
+    private static async Task<HashSalt> CreatePasswordHash(string password)
     {
         using var hmac = new HMACSHA512();
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(password));

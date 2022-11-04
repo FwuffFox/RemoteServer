@@ -10,5 +10,14 @@ public class RegisterCode
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int Id { get; set; }
 
-    public string? Code { get; set; }
+    public string Code { get; set; } = string.Empty;
+
+    private string _role = string.Empty;
+
+    public string Role
+    {
+        get => _role;
+        set => _role = value is Roles.Admin ? value : Roles.User;
+    }
 }
+

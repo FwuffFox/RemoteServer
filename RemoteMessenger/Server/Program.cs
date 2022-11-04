@@ -42,6 +42,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+var logger = app.Services.GetService<ILogger<Program>>();
 app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
 app.MapGet("/encrypt/{encryptedString}",
     RSAEncryption.Decrypt_Base64);
@@ -53,5 +54,4 @@ app.MapGet("/validate_jwt/{jwt}",
     });
 app.MapGet("/check_auth", [Authorize](HttpContext context) => "Authenticated");
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
-
 app.Run();

@@ -8,7 +8,7 @@ namespace RemoteMessenger.Server.Util;
 // TODO: REMAKE FOR DEPENDENCY INJECTION!!!!!
 public static class JwtTokenManager
 {
-    private static SymmetricSecurityKey? Key;
+    private static SymmetricSecurityKey? _key;
     private static string Secret { get; set; } = string.Empty;
 
     private static int ExpireDays { get; set; }
@@ -22,14 +22,14 @@ public static class JwtTokenManager
     public static void Initialize(string secret, int expireDays, string issuer, string audience)
     {
         Secret = secret;
-        Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
         ExpireDays = expireDays;
         Issuer = issuer;
         Audience = audience;
         TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = Key,
+            IssuerSigningKey = _key,
             ValidateAudience = true,
             ValidAudience = Audience,
             ValidateIssuer = true,
@@ -50,10 +50,14 @@ public static class JwtTokenManager
     {
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.Ticks.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, user.Username),
             new(JwtRegisteredClaimNames.Name, user.FullName),
-            new(JwtRegisteredClaimNames.UniqueName, user.Username)
+            new(JwtRegisteredClaimNames.Gender, user.Gender),
+            new(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth),
+            new(ClaimsIdentity.DefaultRoleClaimType, user.Role)
         };
-        var signingCredentials = new SigningCredentials(Key, SecurityAlgorithms.HmacSha512Signature);
+        var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(
             issuer: Issuer,
             audience: Audience,
