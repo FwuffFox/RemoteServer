@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace RemoteMessenger.Server.Models;
 
 public sealed class MessengerContext : DbContext
@@ -12,7 +10,7 @@ public sealed class MessengerContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<RegisterCode> RegisterCodes { get; set; } = null!;
 
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("User");

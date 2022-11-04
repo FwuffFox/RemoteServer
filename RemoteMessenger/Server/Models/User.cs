@@ -1,14 +1,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Models;
 
 public class User
 {
+    private string _username = string.Empty;
+
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int Id { get; init; }
-
-    private string _username = string.Empty;
 
     public string Username
     {
@@ -21,10 +20,10 @@ public class User
     }
 
     public string FullName { get; set; } = string.Empty;
-    
+
     public string JobTitle { get; set; } = string.Empty;
-    
+
     public byte[] PasswordHash { get; set; }
-    
+
     public byte[] PasswordSalt { get; set; }
 }

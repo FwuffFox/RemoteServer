@@ -1,13 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace RemoteMessenger.Server.Util;
 
 public static class JwtTokenManager
 {
+    public static SymmetricSecurityKey? Key;
     private static string Secret { get; set; } = string.Empty;
-    public static SymmetricSecurityKey? Key = null!;
 
     public static void Initialize(string secret)
     {
@@ -15,17 +14,19 @@ public static class JwtTokenManager
         Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
     }
 
-    public static async Task<bool> ValidateToken(string token, string issuer)
+    public static async Task<TokenValidationResult> ValidateToken(string token, string issuer)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
+
         var result = await tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = Key,
+            ValidateAudience = false,
             ValidateIssuer = true,
             ValidIssuer = issuer,
-            IssuerSigningKey = Key,
-            ValidateLifetime = true,
+            ValidateLifetime = true
         });
-        return result.IsValid;
+
+        return result;
     }
 }

@@ -29,7 +29,11 @@ app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
 app.MapGet("/encrypt/{encryptedString}",
     RSAEncryption.Decrypt_Base64);
 app.MapGet("/validate_jwt/{jwt}",
-    async (string jwt, HttpContext context) => await JwtTokenManager.ValidateToken(jwt, context.GetRequestBaseUrl()));
+    async (string jwt, HttpContext context) =>
+    {
+        var res = await JwtTokenManager.ValidateToken(jwt, context.GetRequestBaseUrl());
+        return res.IsValid;
+    });
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 
 RSAEncryption.Initialize();

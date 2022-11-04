@@ -1,3 +1,3 @@
 global using Microsoft.EntityFrameworkCore;
-
-namespace RemoteMessenger.Server;
+global using System.Text;
+global using RemoteMessenger.Server;

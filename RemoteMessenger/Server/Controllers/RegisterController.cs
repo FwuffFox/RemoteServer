@@ -1,7 +1,5 @@
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Shared;
 
@@ -11,8 +9,8 @@ namespace RemoteMessenger.Server.Controllers;
 [Route("api/register")]
 public class RegisterController : ControllerBase
 {
-    private ILogger<RegisterController> _logger;
-    private MessengerContext _context;
+    private readonly MessengerContext _context;
+    private readonly ILogger<RegisterController> _logger;
 
     public RegisterController(ILogger<RegisterController> logger, MessengerContext context)
     {
@@ -53,4 +51,4 @@ public class RegisterController : ControllerBase
         passSalt = hmac.Key;
         passHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
     }
-} 
+}
