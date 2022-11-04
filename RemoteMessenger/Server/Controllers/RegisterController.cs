@@ -29,14 +29,16 @@ public class RegisterController : ControllerBase
             code => request.RegistrationCode == code.Code);
         if (requestCode is null) return BadRequest("Registration code doesn't exist");
 
-        CreatePasswordHash(request.Password, out var passHash, out var passSalt);
+        var hashSalt = await CreatePasswordHash(request.Password);
         var user = new User
         {
             Username = request.Username.ToLower(),
             FullName = request.FullName,
             JobTitle = request.JobTitle,
-            PasswordHash = passHash,
-            PasswordSalt = passSalt
+            Gender = request.Gender,
+            DateOfBirth = request.DateOfBirth,
+            PasswordHash = hashSalt.Hash,
+            PasswordSalt = hashSalt.Salt
         };
         _context.RegisterCodes.Remove(requestCode);
         await _context.Users.AddAsync(user);
@@ -44,11 +46,21 @@ public class RegisterController : ControllerBase
         _logger.LogInformation($"{user.Username} was registered by code: {request.RegistrationCode}");
         return Ok("User was registered");
     }
-
-    private void CreatePasswordHash(string password, out byte[] passHash, out byte[] passSalt)
+    
+    private async Task<HashSalt> CreatePasswordHash(string password)
     {
         using var hmac = new HMACSHA512();
-        passSalt = hmac.Key;
-        passHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(password));
+        return new HashSalt
+        {
+            Salt = hmac.Key,
+            Hash = await hmac.ComputeHashAsync(stream)
+        };
+    }
+
+    private struct HashSalt
+    {
+        public byte[] Hash { get; init; }
+        public byte[] Salt { get; init; }
     }
 }

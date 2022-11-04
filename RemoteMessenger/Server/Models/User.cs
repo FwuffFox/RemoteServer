@@ -5,11 +5,11 @@ namespace RemoteMessenger.Server.Models;
 
 public sealed class User
 {
-    private string _username = string.Empty;
-
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int Id { get; init; }
-
+    
+    private string _username = string.Empty;
+    
     public string Username
     {
         get => _username;
@@ -19,9 +19,13 @@ public sealed class User
             _username = value.ToLower();
         }
     }
+    
+    public string FullName { get; set; } = string.Empty;
 
     private string _gender = string.Empty;
 
+    public string JobTitle { get; set; } = string.Empty;
+    
     public string Gender
     {
         get => _gender;
@@ -33,10 +37,8 @@ public sealed class User
     }
     
     public string DateOfBirth { get; set; } = string.Empty;
-    
-    public string FullName { get; set; } = string.Empty;
 
-    public string JobTitle { get; set; } = string.Empty;
+
 
     public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
 
