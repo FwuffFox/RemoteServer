@@ -5,3 +5,6 @@ generated_files/
 Migrations/
 riderModule.iml
 /_ReSharper.Caches/
+
+# Don't put Development appsettings into master
+*.Development.json
