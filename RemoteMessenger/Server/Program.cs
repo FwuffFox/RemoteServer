@@ -10,8 +10,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var connectionString = builder.Configuration.GetConnectionString("Database") ?? "Data Source=Database.db";
-builder.Services.AddDbContext<MessengerContext>(op => op.UseSqlite(connectionString));
+var connectionString = builder.Configuration.GetSection("Database").Value;
+builder.Services.AddDbContext<MessengerContext>(op => op.UseNpgsql(connectionString));
 builder.Services.AddSignalR();
 
 // Initialize JwtTokenManager
