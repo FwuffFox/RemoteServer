@@ -1,17 +1,16 @@
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/register")]
 public class RegisterController : ControllerBase
 {
-    private ILogger<RegisterController> _logger;
-    private MessengerContext _context;
+    private readonly MessengerContext _context;
+    private readonly ILogger<RegisterController> _logger;
 
     public RegisterController(ILogger<RegisterController> logger, MessengerContext context)
     {
@@ -20,36 +19,52 @@ public class RegisterController : ControllerBase
     }
 
     [HttpPost(Name = "RegisterUser")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(RegisterForm form)
+    public async Task<ActionResult<string>> Register(RegisterUserDto request)
     {
-        var registerKey = await _context.RegisterCodes.FirstOrDefaultAsync(r => r.Code == form.RegisterCode);
-        if (registerKey is null) return BadRequest("RegisterKey is wrong or doesn't exist");
-        _context.RegisterCodes.Remove(registerKey);
-        if (!RSAEncryption.TryDecrypt_Bytes(form.RsaEncryptedPassword, out var decryptedBytes))
-        {
-            return BadRequest("Couldn't decrypt RSAEncryptedPassword");
-        }
-        using var sha256 = SHA256.Create();
-        var hashedPasswordBytes = sha256.ComputeHash(decryptedBytes);
-        var hashedPassword = Convert.ToBase64String(hashedPasswordBytes);
+        var isUsernameTaken = await _context.Users.AnyAsync(user => user.Username == request.Username);
+        if (isUsernameTaken) return BadRequest($"Username {request.Username} is taken");
+        
+        var registerCode = await _context.RegisterCodes.FirstOrDefaultAsync(
+            code => request.RegistrationCode == code.Code);
+        if (registerCode is null) return BadRequest("Registration code doesn't exist");
+
+        var hashSalt = await CreatePasswordHash(request.Password);
         var user = new User
         {
-            PublicRsaKey = form.UserPublicRsaKey,
-            Username = form.Name.ToLower(),
-            HashedPassword = hashedPassword
+            Username = request.Username.ToLower(),
+            FullName = request.FullName,
+            JobTitle = request.JobTitle,
+            Role = registerCode.Role,
+            Gender = request.Gender,
+            DateOfBirth = request.DateOfBirth,
+            PasswordHash = hashSalt.Hash,
+            PasswordSalt = hashSalt.Salt
         };
-        _logger.LogInformation(string.Format("{0} with hashed password {1} was registered", form.Name, hashedPassword));
-        _context.Users.Add(user);
-        return Ok(user);
+        
+        _context.RegisterCodes.Remove(registerCode);
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        
+        _logger.LogInformation($"{user.Username} was registered by code: {request.RegistrationCode}");
+        return Ok("User was registered");
     }
-}
+    
+    private static async Task<HashSalt> CreatePasswordHash(string password)
+    {
+        using var hmac = new HMACSHA512();
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(password));
+        return new HashSalt
+        {
+            Salt = hmac.Key,
+            Hash = await hmac.ComputeHashAsync(stream)
+        };
+    }
 
-public class RegisterForm
-{
-    public string Name { get; init; }
-    public string UserPublicRsaKey { get; init; }
-    public string RsaEncryptedPassword { get; init; }
-    public string RegisterCode { get; init; }
+    private struct HashSalt
+    {
+        public byte[] Hash { get; init; }
+        public byte[] Salt { get; init; }
+    }
 }

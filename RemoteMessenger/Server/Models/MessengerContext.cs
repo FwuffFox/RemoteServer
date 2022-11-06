@@ -1,13 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace RemoteMessenger.Server.Models;
 
-public class MessengerContext : DbContext
+public sealed class MessengerContext : DbContext
 {
-    public MessengerContext(DbContextOptions<MessengerContext> options) : base(options) {}
+    public MessengerContext(DbContextOptions<MessengerContext> options) : base(options)
+    {
+        Database.EnsureCreated();
+    }
 
-    public DbSet<User> Users;
-    public DbSet<RegisterCode> RegisterCodes;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<RegisterCode> RegisterCodes { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

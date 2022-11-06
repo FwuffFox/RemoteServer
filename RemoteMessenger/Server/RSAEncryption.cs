@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using System.Text;
 
 namespace RemoteMessenger.Server;
 
@@ -26,7 +25,7 @@ public static class RSAEncryption
     }
 
     private static void LoadFromKeyFile()
-    { 
+    {
         using var rsa = RSA.Create(2048);
         using var keyFileRs = new StreamReader("generated_files/rsa_key.xml", Encoding.UTF8);
         var xmlString = keyFileRs.ReadToEnd();
@@ -79,7 +78,7 @@ public static class RSAEncryption
             return false;
         }
     }
-    
+
     public static bool TryDecrypt_Bytes(string encryptedBase64, out byte[] decryptedBytes)
     {
         try
@@ -92,6 +91,5 @@ public static class RSAEncryption
             decryptedBytes = Array.Empty<byte>();
             return false;
         }
-        
     }
 }

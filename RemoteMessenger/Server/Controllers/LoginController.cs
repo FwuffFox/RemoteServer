@@ -1,17 +1,21 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Server.Util;
+using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/login")]
 public class LoginController : ControllerBase
 {
+    private readonly MessengerContext _context;
 
-    private ILogger<LoginController> _logger;
-    private MessengerContext _context;
+    private readonly ILogger<LoginController> _logger;
 
     public LoginController(MessengerContext context, ILogger<LoginController> logger)
     {
@@ -19,37 +23,24 @@ public class LoginController : ControllerBase
         _logger = logger;
     }
 
-    public struct LoginForm
-    {
-        public string Username { get; set; }
-        public string RsaEncryptedPassword { get; set; }
-    }
-    
     [HttpPost(Name = "Login")]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Post(LoginForm form)
+    public async Task<ActionResult<string>> Login(LoginUserDto request)
     {
-        var username = form.Username.ToLower();
-        if (!RSAEncryption.TryDecrypt_Bytes(form.RsaEncryptedPassword, out var decryptedBytes))
-        {
-            return BadRequest("Couldn't decrypt password");
-        }
-        using var sha = SHA256.Create();
-        var hashedPasswordBytes = sha.ComputeHash(decryptedBytes);
-        var hashedPassword = Convert.ToBase64String(hashedPasswordBytes);
-
-        var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == username 
-                                                                    && user.HashedPassword == hashedPassword);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
+        if (user is null) return BadRequest($"User {request.Username} was not found");
+        if (!await VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            return BadRequest("Password is wrong");
         
-        if (user is null)
-        {
-            return Forbid();
-        }
+        var token = await JwtTokenManager.IssueToken(user);
+        _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.\n Token: {token}");
+        return Ok(token);
+    }
 
-        var guid = new Guid();
-        Response.Cookies.Append("session-id", guid.ToString());
-        return Ok();
+    private async Task<bool> VerifyPasswordHash(string password, byte[] passHash, byte[] passSalt)
+    {
+        using var hmac = new HMACSHA512(passSalt);
+        var passStream = new MemoryStream(Encoding.UTF8.GetBytes(password));
+        var computeHash = await hmac.ComputeHashAsync(passStream);
+        return computeHash.SequenceEqual(passHash);
     }
 }

@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Blazored.LocalStorage" Version="4.3.0-preview.1" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Shared\RemoteMessenger.Shared.csproj" />
     </ItemGroup>
 
 </Project>

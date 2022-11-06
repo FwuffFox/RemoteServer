@@ -8,3 +8,8 @@ riderModule.iml
 
 # Don't put Development appsettings into master
 *.Development.json
+*.db
+*.db-shm
+*.db-wal
+.idea/
+.vs/

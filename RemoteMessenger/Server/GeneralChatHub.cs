@@ -6,12 +6,12 @@ public class GeneralChatHub : Hub
 {
     public const string HubUrl = "/general_chat";
     private readonly ILogger<GeneralChatHub> _logger;
-    
+
     public GeneralChatHub(ILogger<GeneralChatHub> logger)
     {
         _logger = logger;
     }
-    
+
     public async Task Broadcast(string username, string message)
     {
         await Clients.All.SendAsync("Broadcast", username, message);

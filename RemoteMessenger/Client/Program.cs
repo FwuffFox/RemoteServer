@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Authorization;
+using RemoteMessenger.Client;
 using RemoteMessenger.Client.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-
+builder.Services.AddAuthenticationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, MessengerStateProvider>();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<Server>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

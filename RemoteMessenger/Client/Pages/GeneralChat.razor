@@ -85,7 +85,7 @@ else
             // remove old messages if any
             _messages.Clear();
 
-            _hubUrl = "https://localhost:7219/general_chat";
+            _hubUrl = "https://localhost:5001/general_chat";
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(_hubUrl)
