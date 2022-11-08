@@ -8,7 +8,7 @@ namespace RemoteMessenger.Server.Models;
 public class RegistrationCode
 {
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     public string Code { get; set; } = string.Empty;
 

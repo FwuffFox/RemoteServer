@@ -51,13 +51,14 @@ public static class JwtTokenManager
     {
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Jti, new Guid().ToString()),
-            new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.Ticks.ToString()),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.Now).ToString(), 
+                ClaimValueTypes.Integer64),
             new(JwtRegisteredClaimNames.UniqueName, user.Username),
             new(JwtRegisteredClaimNames.Name, user.FullName),
             new(JwtRegisteredClaimNames.Gender, user.Gender),
             new(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth),
-            new("Roles", user.Role)
+            new("roles", user.Role)
         };
         var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(
