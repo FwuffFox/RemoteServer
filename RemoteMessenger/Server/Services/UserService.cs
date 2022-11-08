@@ -1,33 +1,34 @@
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Services;
 
 public class UserService
 {
     private readonly MessengerContext _context;
+    private readonly ILogger<UserService> _logger;
 
     public UserService(MessengerContext context)
     {
         _context = context;
-    }
-
-    public async Task CreateUser(User user)
-    {
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteUser(User user)
-    {
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
+        _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<UserService>();
     }
     
-    public async Task DeleteUser(string username)
+    public async Task<User?> GetUserAsync(string username)
+        => await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+
+    public async Task<RegistrationCode?> GetRegistrationCodeAsync(string code)
+        => await _context.RegistrationCodes.FirstOrDefaultAsync(regCode => code == regCode.Code);
+    
+    public async Task<bool> IsUsernameTaken(string username)
+        => await _context.Users.AnyAsync(user => user.Username == username);
+
+    public async Task CreateUser(User user, RegistrationCode code)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (user is null) return;
-        _context.Users.Remove(user);
+        _context.RegistrationCodes.Remove(code);
+        await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation($"{user.Username} was registered as {user.Role} by code: {code.Code}");
     }
 }

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Models;
+using RemoteMessenger.Server.Services;
 using RemoteMessenger.Shared;
 
 namespace RemoteMessenger.Server.Controllers;
@@ -9,13 +10,11 @@ namespace RemoteMessenger.Server.Controllers;
 [Route("api/register")]
 public class RegisterController : ControllerBase
 {
-    private readonly MessengerContext _context;
-    private readonly ILogger<RegisterController> _logger;
+    private readonly UserService _userService;
 
-    public RegisterController(ILogger<RegisterController> logger, MessengerContext context)
+    public RegisterController(UserService userService)
     {
-        _logger = logger;
-        _context = context;
+        _userService = userService;
     }
 
     [HttpPost(Name = "RegisterUser")]
@@ -23,14 +22,12 @@ public class RegisterController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Register(RegisterUserDto request)
     {
-        var isUsernameTaken = await _context.Users.AnyAsync(user => user.Username == request.Username);
-        if (isUsernameTaken) return BadRequest($"Username {request.Username} is taken");
+        var usernameIsTaken = await _userService.IsUsernameTaken(request.Username);
+        if (usernameIsTaken) return BadRequest($"Username {request.Username} is taken");
         
-        var registerCode = await _context.RegisterCodes.FirstOrDefaultAsync(
-            code => request.RegistrationCode == code.Code);
+        var registerCode = await _userService.GetRegistrationCodeAsync(request.RegistrationCode);
         if (registerCode is null) return BadRequest("Registration code doesn't exist");
-
-        var hashSalt = await CreatePasswordHash(request.Password);
+        
         var user = new User
         {
             Username = request.Username.ToLower(),
@@ -39,28 +36,13 @@ public class RegisterController : ControllerBase
             Role = registerCode.Role,
             Gender = request.Gender,
             DateOfBirth = request.DateOfBirth,
-            PasswordHash = hashSalt.Hash,
-            PasswordSalt = hashSalt.Salt
         };
+        await user.SetPassword(request.Password);
+        await _userService.CreateUser(user, registerCode);
         
-        _context.RegisterCodes.Remove(registerCode);
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-        
-        _logger.LogInformation($"{user.Username} was registered by code: {request.RegistrationCode}");
         return Ok("User was registered");
     }
     
-    private static async Task<HashSalt> CreatePasswordHash(string password)
-    {
-        using var hmac = new HMACSHA512();
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes(password));
-        return new HashSalt
-        {
-            Salt = hmac.Key,
-            Hash = await hmac.ComputeHashAsync(stream)
-        };
-    }
 
     private struct HashSalt
     {

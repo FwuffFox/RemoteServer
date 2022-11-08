@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
 
 namespace RemoteMessenger.Server.Models;
 
@@ -46,7 +46,26 @@ public sealed class User
     
     public string DateOfBirth { get; set; } = string.Empty;
 
-    public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+    public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
 
-    public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
+    public byte[] PasswordSalt { get; private set; } = Array.Empty<byte>();
+
+    public async Task<bool> IsPasswordValidAsync(string password)
+    {
+        using var hmac = new HMACSHA512(PasswordSalt);
+        var passStream = new MemoryStream(Encoding.UTF8.GetBytes(password));
+        var computeHash = await hmac.ComputeHashAsync(passStream);
+        return computeHash.SequenceEqual(PasswordHash);
+    }
+
+    /// <summary>
+    /// Creates a new Salt and Hash for <c>User</c>.
+    /// </summary>
+    public async Task SetPassword(string newPassword)
+    {
+        using var hmac = new HMACSHA512();
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(newPassword));
+        PasswordSalt = hmac.Key;
+        PasswordHash = await hmac.ComputeHashAsync(stream);
+    }
 }

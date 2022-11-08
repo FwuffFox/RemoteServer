@@ -8,12 +8,12 @@ public sealed class MessengerContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<RegisterCode> RegisterCodes { get; set; } = null!;
+    public DbSet<RegistrationCode> RegistrationCodes { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("User");
-        modelBuilder.Entity<RegisterCode>().ToTable("Register Code");
+        modelBuilder.Entity<RegistrationCode>().ToTable("Registration Code");
     }
 }

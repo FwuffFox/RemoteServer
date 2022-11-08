@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RemoteMessenger.Server.Models;
 
@@ -18,7 +19,7 @@ public static class JwtTokenManager
     private static string Audience { get; set; } = string.Empty;
 
     public static TokenValidationParameters? TokenValidationParameters;
-
+    
     public static void Initialize(string secret, int expireDays, string issuer, string audience)
     {
         Secret = secret;
@@ -39,23 +40,24 @@ public static class JwtTokenManager
         };
     }
 
-    public static async Task<TokenValidationResult> ValidateToken(string token, string issuer)
+    public static async Task<TokenValidationResult> ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var result = await tokenHandler.ValidateTokenAsync(token, TokenValidationParameters);
         return result;
     }
 
-    public static async Task<string> IssueToken(User user)
+    public static string IssueToken(User user)
     {
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, new Guid().ToString()),
             new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.Ticks.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, user.Username),
             new(JwtRegisteredClaimNames.Name, user.FullName),
             new(JwtRegisteredClaimNames.Gender, user.Gender),
             new(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth),
-            new(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+            new("Roles", user.Role)
         };
         var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(

@@ -7,7 +7,7 @@ public class UserBaseDto
     private string _username = string.Empty;
 
     [Required(ErrorMessage = "Требуется имя пользователя @example.")]
-    [MaxLength(20, ErrorMessage = "Никнейм должно быть меньше или равным 20-ти симболам.")]
+    [MaxLength(20, ErrorMessage = "Никнейм должен быть меньше или равен 20-ти симболам.")]
     public string Username
     {
         get => _username;

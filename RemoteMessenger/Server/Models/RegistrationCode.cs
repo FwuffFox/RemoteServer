@@ -5,7 +5,7 @@ namespace RemoteMessenger.Server.Models;
 /// <summary>
 ///     Codes which are used to register unique users.
 /// </summary>
-public class RegisterCode
+public class RegistrationCode
 {
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int Id { get; set; }
