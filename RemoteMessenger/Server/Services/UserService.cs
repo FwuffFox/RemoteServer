@@ -8,14 +8,17 @@ public class UserService
     private readonly MessengerContext _context;
     private readonly ILogger<UserService> _logger;
 
-    public UserService(MessengerContext context)
+    public UserService(MessengerContext context, ILogger<UserService> logger)
     {
         _context = context;
-        _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<UserService>();
+        _logger = logger;
     }
     
     public async Task<User?> GetUserAsync(string username)
         => await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+    
+    public async Task<User?> GetUserAsync(int id)
+        => await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
 
     public async Task<IEnumerable<User>> GetAllUsersAsync()
     {

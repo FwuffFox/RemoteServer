@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 
 namespace RemoteMessenger.Server.Models;
 
@@ -46,9 +47,11 @@ public sealed class User
     }
     
     public string DateOfBirth { get; set; } = string.Empty;
-
+    
+    [JsonIgnore] // Secret data
     public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
 
+    [JsonIgnore] // Secret data
     public byte[] PasswordSalt { get; private set; } = Array.Empty<byte>();
 
     public async Task<bool> IsPasswordValidAsync(string password)

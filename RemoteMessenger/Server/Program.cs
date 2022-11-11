@@ -4,7 +4,6 @@ using Microsoft.OpenApi.Models;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
-using RemoteMessenger.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,9 +99,6 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/check_auth_admin", [Authorize(Roles = Roles.Admin)] (HttpContext context)
         => "Authenticated as Admin");
 }
-
-app.MapGet("/get_all_users", [Authorize(Roles = Roles.Admin)] async (UserService userService)
-    => await userService.GetAllUsersAsync());
 
 app.MapPost("/add_register_code", 
     [Authorize(Roles = Roles.Admin)] async (HttpContext context, UserService userService, RegistrationCodeDto code) =>
