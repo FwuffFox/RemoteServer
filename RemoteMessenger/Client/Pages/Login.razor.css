@@ -123,6 +123,8 @@ h1 {
 }
 
 .img_buttons {
+    background-color: transparent;
+    border: 0;
     text-decoration: none;
     color: #000000;
 }
