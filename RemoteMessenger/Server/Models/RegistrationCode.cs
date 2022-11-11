@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RemoteMessenger.Server.Models;
@@ -7,7 +8,8 @@ namespace RemoteMessenger.Server.Models;
 /// </summary>
 public class RegistrationCode
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [Key, Column(Order = 0)]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
 
     public string Code { get; set; } = string.Empty;

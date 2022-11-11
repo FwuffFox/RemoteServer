@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
 
@@ -5,11 +6,11 @@ namespace RemoteMessenger.Server.Models;
 
 public sealed class User
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [Key, Column(Order = 0)]
     public int Id { get; init; }
     
     private string _username = string.Empty;
-    
+
     public string Username
     {
         get => _username;
