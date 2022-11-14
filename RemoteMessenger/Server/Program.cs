@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
@@ -86,8 +87,8 @@ app.MapControllers();
 app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
 app.MapGet("/encrypt/{encryptedString}",
     RSAEncryption.Decrypt_Base64);
-app.MapGet("/validate_jwt/{jwt}",
-    async (string jwt, HttpContext context) =>
+app.MapGet("/validate_jwt",
+    async ([FromQuery] string jwt, HttpContext context) =>
     {
         var res = await JwtTokenManager.ValidateToken(jwt);
         return res.IsValid;

@@ -11,7 +11,7 @@ using RemoteMessenger.Shared;
 namespace RemoteMessenger.Server.Controllers;
 
 [ApiController]
-[Route("api/login")]
+[Route("api/auth/login")]
 public class LoginController : ControllerBase
 {
     private readonly ILogger<LoginController> _logger;

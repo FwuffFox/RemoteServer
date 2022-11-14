@@ -4,6 +4,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IJSRuntime Js
 @inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 <PageTitle>Login</PageTitle>
 
 <div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">	
@@ -86,6 +87,16 @@
 		else
 		{
 			authMessage = "The user is NOT authenticated.";
+		}
+	}
+
+	protected override async void OnInitialized()
+	{
+		var authState = await authenticationStateTask;
+		var user = authState.User;
+		if (user.Identity.IsAuthenticated)
+		{
+			NavigationManager.NavigateTo("/");
 		}
 	}
 }

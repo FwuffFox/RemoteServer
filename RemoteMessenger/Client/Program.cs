@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components.Authorization;
-using RemoteMessenger.Client;
+using RemoteMessenger.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

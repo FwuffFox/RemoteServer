@@ -6,7 +6,7 @@ using RemoteMessenger.Server.Services;
 namespace RemoteMessenger.Server.Controllers;
 
 [ApiController]
-[Route("api/register")]
+[Route("api/auth/register")]
 public class RegisterController : ControllerBase
 {
     private readonly UserService _userService;
@@ -40,12 +40,5 @@ public class RegisterController : ControllerBase
         await _userService.CreateUser(user, registerCode);
         
         return Ok("User was registered");
-    }
-    
-
-    private struct HashSalt
-    {
-        public byte[] Hash { get; init; }
-        public byte[] Salt { get; init; }
     }
 }
