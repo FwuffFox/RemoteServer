@@ -1,12 +1,9 @@
 ﻿@page "/login";
-@using System.ComponentModel.DataAnnotations
-@using System.Net
-@using Blazored.LocalStorage
 @layout Shared.Layouts.EmptyLayout;
 @inject ILogger<Login> Logger;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IJSRuntime Js
-@inject Server Server
+@inject HttpClient HttpClient
 <PageTitle>Login</PageTitle>
 
 <div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">	
@@ -64,7 +61,7 @@
 
 	private async Task HandleValidSubmit()
 	{
-		var result = await Server.ServerClient.PostAsJsonAsync("api/login", _loginValidationModel);
+		var result = await HttpClient.PostAsJsonAsync("api/login", _loginValidationModel);
 		if (!result.IsSuccessStatusCode)
 		{
 			_loginErrorMessage = await result.Content.ReadAsStringAsync();
@@ -73,6 +70,7 @@
 		}
 		var token = await result.Content.ReadAsStringAsync();
 		await Js.InvokeAsync<object>("console.log", token);
+		
 	}
 
 	private string authMessage;
@@ -83,7 +81,7 @@
 		var user = authState.User;
 		if (user.Identity.IsAuthenticated)
 		{
-			authMessage = $"{user.Identity.Name} is authenticated.";
+			authMessage = $"{user.FindFirst(claim => claim.Type == "name")} is authenticated.";
 		}
 		else
 		{

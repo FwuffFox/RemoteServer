@@ -4,6 +4,13 @@
 <h1>hey!</h1>
 
 <AuthorizeView>
-    If you see it, you're authorized as @context.User.Identity.Name
+    <NotAuthorized>
+        <span> Not authorized </span>
+    </NotAuthorized>
+    <Authorized>
+        @foreach (var claim in context.User.Claims)
+        {
+            <span> @claim.Type: @claim.Value</span><br/>
+        }
+    </Authorized>
 </AuthorizeView>
-Welcome to your new app.

@@ -1,25 +1,22 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace RemoteMessenger.Client;
 
-public class MessengerStateProvider : AuthenticationStateProvider
+public class MessengerAuthStateProvider : AuthenticationStateProvider
 {
-    public MessengerStateProvider()
-    {
-        
-    }
     
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var identity = new ClaimsIdentity();
+        var token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlOWM0NGIwOC1iMTdiLTQ3NWMtYTczNi05ODE4ZmNkNTQyMDYiLCJpYXQiOjE2Njg0NDg0MTksInVuaXF1ZV9uYW1lIjoiQGFuZHJldyIsIm5hbWUiOiJBbmRyZXcgRm94IiwiZ2VuZGVyIjoibWFsZSIsImJpcnRoZGF0ZSI6IjEzLjA5LjIwMDUiLCJyb2xlcyI6IkFkbWluIiwiZXhwIjoxNjY5NjU4MDE5LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo1MDAxLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDAvIn0.TVELrS5D8M1iK8hQRto6zZWmrZZcYYrfBrr7Zn3IF_k3xiMpmwpevrZPXrawPQQDrVJK6uq_iZZ-oOgkySCiHg";
+        
+        var claims = new List<Claim> {new (ClaimTypes.Name, "Test")};
+        var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
         var user = new ClaimsPrincipal(identity);
         var state = new AuthenticationState(user);
         
         NotifyAuthenticationStateChanged(Task.FromResult(state));
-        
         return state;
     }
     
