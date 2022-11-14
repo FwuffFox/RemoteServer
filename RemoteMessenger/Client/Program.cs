@@ -9,6 +9,7 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddOptions();
 builder.Services.AddScoped<AuthenticationStateProvider, MessengerAuthStateProvider>();
+builder.Services.AddScoped<JwtManager>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddAuthorizationCore();
 

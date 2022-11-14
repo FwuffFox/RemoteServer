@@ -7,18 +7,17 @@ namespace RemoteMessenger.Client.Services;
 public class MessengerAuthStateProvider : AuthenticationStateProvider
 {
     private static readonly AuthenticationState AnonymousState = new(new ClaimsPrincipal(new ClaimsIdentity()));
-    private readonly HttpClient _client;
+    private readonly JwtManager _jwtManager;
 
-    public MessengerAuthStateProvider(HttpClient client)
+    public MessengerAuthStateProvider(JwtManager jwtManager)
     {
-        _client = client;
+        _jwtManager = jwtManager;
     }
     
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlOWM0NGIwOC1iMTdiLTQ3NWMtYTczNi05ODE4ZmNkNTQyMDYiLCJpYXQiOjE2Njg0NDg0MTksInVuaXF1ZV9uYW1lIjoiQGFuZHJldyIsIm5hbWUiOiJBbmRyZXcgRm94IiwiZ2VuZGVyIjoibWFsZSIsImJpcnRoZGF0ZSI6IjEzLjA5LjIwMDUiLCJyb2xlcyI6IkFkbWluIiwiZXhwIjoxNjY5NjU4MDE5LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo1MDAxLyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDAvIn0.TVELrS5D8M1iK8hQRto6zZWmrZZcYYrfBrr7Zn3IF_k3xiMpmwpevrZPXrawPQQDrVJK6uq_iZZ-oOgkySCiHg";
-        var response = await _client.GetAsync($"/validate_jwt?jwt={token}");
-        if (await response.Content.ReadAsStringAsync() == "false")
+        var token = await _jwtManager.LoadJwt();
+        if (token is null || !await _jwtManager.ValidateJwt(token))
         {
             NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
             return AnonymousState;
