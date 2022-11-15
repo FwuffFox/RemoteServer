@@ -1,0 +1,74 @@
+﻿@page "/auth/register"
+@layout EmptyLayout
+<PageTitle>Register</PageTitle>
+
+<div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">
+	
+	
+	<div id="background"></div>
+
+	<img src="Icon.png" width="100%">
+
+	<div class="text-field text-field_floating">
+		<input tabindex="1" class="text-field__input" type="email" id="code" placeholder=" ">
+		<label class="text-field__label" for="code">Регистрационный код</label>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="2" class="text-field__input" type="text" id="name" placeholder=" ">
+		<label class="text-field__label" for="name">Фамилия Имя Отчество</label>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="3" class="text-field__input" type="text" id="nickname" placeholder=" ">
+		<label class="text-field__label" for="nickname">Никнейм</label>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="4" class="text-field__input" type="date" id="date" value="1999-01-01" placeholder=" ">
+		<label class="text-field__label" style="opacity: 1;" for="date">Дата рождения</label>
+	</div>
+	<div class="text-field form_radio_group">
+		<div class="form_radio_group-item">
+			<input id="man" type="radio" name="name" value="1">
+			<label for="man">Муж</label>
+		</div>
+		<div class="form_radio_group-item">
+			<input id="wom" type="radio" name="name" value="2">
+			<label for="wom">Жен</label>
+		</div>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="5" class="text-field__input" type="text" id="post" placeholder=" ">
+		<label class="text-field__label" for="post">Должность</label>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="6" class="text-field__input" type="text" id="password" placeholder=" ">
+		<label class="text-field__label" for="password">Пароль</label>
+	</div>
+	<div class="text-field text-field_floating">
+		<input tabindex="7" class="text-field__input" type="text" id="check_password" placeholder=" ">
+		<label class="text-field__label" for="check_password">Проверка пароля</label>
+	</div>
+	
+	<div class="link_button center_vertical">
+		<button tabindex="8" class="img_buttons" type="submit">
+			<div id="buttons">
+				<div class="text_buttons">СОЗДАТЬ</div>
+			</div>
+		</button>
+	</div>
+</div>		
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

@@ -1,11 +1,10 @@
-﻿@page "/login";
+﻿@page "/auth/login";
 @using RemoteMessenger.Client.Services
-@layout Shared.Layouts.EmptyLayout
+@layout EmptyLayout
 @inject ILogger<Login> Logger
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IJSRuntime Js
 @inject HttpClient HttpClient
-@inject NavigationManager NavigationManager
 @inject JwtManager JwtManager
 <PageTitle>Login</PageTitle>
 

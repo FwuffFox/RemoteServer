@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager NavigationManager
 
 <PageTitle>NotFound</PageTitle>
 
@@ -15,6 +14,6 @@
 {
     protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo("login");
+        NavigationManager.NavigateTo("/auth/login");
     }
 }
