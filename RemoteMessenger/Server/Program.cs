@@ -62,7 +62,7 @@ JwtTokenManager.Initialize(
     audience: builder.Configuration["Jwt:Audience"]
     );
 
-RSAEncryption.Initialize();
+// RSAEncryption.Initialize();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

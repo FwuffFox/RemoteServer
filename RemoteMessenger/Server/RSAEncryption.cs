@@ -38,7 +38,7 @@ public static class RSAEncryption
         using var keyFileSw = new StreamWriter("generated_files/rsa_key", Encoding.UTF8, new FileStreamOptions
         {
             Mode = FileMode.OpenOrCreate,
-            Access = FileAccess.Write
+            Access = FileAccess.ReadWrite
         });
         using var rsa = RSA.Create(2048);
         var xmlString = rsa.ToXmlString(true);
