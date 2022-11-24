@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
 
@@ -63,7 +62,7 @@ JwtTokenManager.Initialize(
     audience: builder.Configuration["Jwt:Audience"]
     );
 
-RSAEncryption.Initialize();
+// RSAEncryption.Initialize();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

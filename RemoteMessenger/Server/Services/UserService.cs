@@ -1,12 +1,15 @@
-using RemoteMessenger.Server.Models;
-using RemoteMessenger.Shared;
-
 namespace RemoteMessenger.Server.Services;
 
-public class UserService
+public class UserService 
 {
     private readonly MessengerContext _context;
     private readonly ILogger<UserService> _logger;
+
+    public MessengerContext Context 
+    {
+        get => _context;
+        private set => value = _context;
+    }
 
     public UserService(MessengerContext context, ILogger<UserService> logger)
     {
@@ -38,7 +41,7 @@ public class UserService
         await _context.SaveChangesAsync();
         _logger.LogInformation($"{user.Username} was registered as {user.Role} by code: {code.Code}");
     }
-    
+
     public async Task CreateRegistrationCodeAsync(RegistrationCode code)
     {
         await _context.RegistrationCodes.AddAsync(code);
