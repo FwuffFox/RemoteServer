@@ -1,66 +1,98 @@
 ﻿@page "/auth/register"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient HttpClient
+@inject IJSRuntime Js
 @layout EmptyLayout
 <PageTitle>Register</PageTitle>
 
 <div style="max-width: 20rem; margin-left: auto; margin-right: auto; padding: 15px;">
-	
-	
 	<div id="background"></div>
 
 	<img src="Icon.png" width="100%">
 
-	<div class="text-field text-field_floating">
-		<input tabindex="1" class="text-field__input" type="email" id="code" placeholder=" ">
-		<label class="text-field__label" for="code">Регистрационный код</label>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="2" class="text-field__input" type="text" id="name" placeholder=" ">
-		<label class="text-field__label" for="name">Фамилия Имя Отчество</label>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="3" class="text-field__input" type="text" id="nickname" placeholder=" ">
-		<label class="text-field__label" for="nickname">Никнейм</label>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="4" class="text-field__input" type="date" id="date" value="1999-01-01" placeholder=" ">
-		<label class="text-field__label" style="opacity: 1;" for="date">Дата рождения</label>
-	</div>
-	<div class="text-field form_radio_group">
-		<div class="form_radio_group-item">
-			<input id="man" type="radio" name="name" value="1">
-			<label for="man">Муж</label>
+	<EditForm Model="@_registerForm" OnValidSubmit="@OnValidInput">
+		<DataAnnotationsValidator/>
+		<div class="text-field text-field_floating">
+			<input tabindex="1" class="text-field__input" type="text" id="code" placeholder=" "
+			       @bind-value="@_registerForm.RegistrationCode">
+			<label class="text-field__label" for="code">Регистрационный код</label>
+			<ValidationMessage For="@(() => _registerForm.RegistrationCode)" />
 		</div>
-		<div class="form_radio_group-item">
-			<input id="wom" type="radio" name="name" value="2">
-			<label for="wom">Жен</label>
+		<div class="text-field text-field_floating">
+			<input tabindex="2" class="text-field__input" type="text" id="name" placeholder=" "
+			       @bind-value="@_registerForm.FullName">
+			<label class="text-field__label" for="name">Фамилия Имя Отчество</label>
+			<ValidationMessage For="@(() => _registerForm.FullName)" />
 		</div>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="5" class="text-field__input" type="text" id="post" placeholder=" ">
-		<label class="text-field__label" for="post">Должность</label>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="6" class="text-field__input" type="text" id="password" placeholder=" ">
-		<label class="text-field__label" for="password">Пароль</label>
-	</div>
-	<div class="text-field text-field_floating">
-		<input tabindex="7" class="text-field__input" type="text" id="check_password" placeholder=" ">
-		<label class="text-field__label" for="check_password">Проверка пароля</label>
-	</div>
-	
-	<div class="link_button center_vertical">
-		<button tabindex="8" class="img_buttons" type="submit">
-			<div id="buttons">
-				<div class="text_buttons">СОЗДАТЬ</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="3" class="text-field__input" type="text" id="nickname" placeholder=" "
+			       @bind-value="@_registerForm.Username">
+			<label class="text-field__label" for="nickname">Никнейм</label>
+			<ValidationMessage For="@(() => _registerForm.Username)" />
+		</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="4" class="text-field__input" type="text" id="date" placeholder=" "
+			       @bind-value="@_registerForm.DateOfBirth">
+			<label class="text-field__label" style="opacity: 1;" for="date">Дата рождения</label>
+			<ValidationMessage For="@(() => _registerForm.DateOfBirth)" />
+		</div>
+		<div class="text-field form_radio_group">
+			<div class="form_radio_group-item">
+				<input id="man" type="radio" name="name" @bind-value="@_registerForm.Gender">
+				<label for="man">Муж</label>
 			</div>
-		</button>
-	</div>
+			<div class="form_radio_group-item">
+				<input id="wom" type="radio" name="name" @bind-value="@_registerForm.Gender">
+				<label for="wom">Жен</label>
+			</div>
+			<ValidationMessage For="@(() => _registerForm.Gender)" />
+		</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="5" class="text-field__input" type="text" id="post" placeholder=" "
+			       @bind-value="@_registerForm.JobTitle">
+			<label class="text-field__label" for="post">Должность</label>
+			<ValidationMessage For="@(() => _registerForm.JobTitle)" />
+		</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="6" class="text-field__input" type="text" id="password" placeholder=" "
+			       @bind-value="@_registerForm.Password">
+			<label class="text-field__label" for="password">Пароль</label>
+			<ValidationMessage For="@(() => _registerForm.Password)" />
+		</div>
+		<div class="text-field text-field_floating">
+			<input tabindex="7" class="text-field__input" type="text" id="check_password" placeholder=" "
+			       @bind-value="@_registerForm.PasswordCheck">
+			<label class="text-field__label" for="check_password">Проверка пароля</label>
+			<ValidationMessage For="@(() => _registerForm.PasswordCheck)" />
+		</div>
+
+		<div class="link_button center_vertical">
+			<button tabindex="8" class="img_buttons" type="submit">
+				<div id="buttons">
+					<div class="text_buttons">Зарегистрироваться</div>
+				</div>
+			</button>
+		</div>
+	</EditForm>
 </div>		
 
 @code {
 
+	private readonly RegisterForm _registerForm = new();
+	
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+	private async void OnValidInput()
+	{
+		var response = await HttpClient.PostAsJsonAsync("/api/auth/register", _registerForm);
+		if (!response.IsSuccessStatusCode)
+		{
+			await Js.InvokeAsync<object>("console.error", response);
+			return;
+		}
+		NavigationManager.NavigateTo("/");
+	}
     
     protected override async void OnInitialized()
     {
@@ -71,4 +103,11 @@
             NavigationManager.NavigateTo("/");
         }
     }
+
+	public class RegisterForm : RegistrationFormDto
+	{
+		[Compare(nameof(Password), ErrorMessage = "Пароли не совпадают!")]
+		public string PasswordCheck { get; set; } = string.Empty;
+	}
+
 }

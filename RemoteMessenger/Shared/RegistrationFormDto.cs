@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RemoteMessenger.Shared;
 
-public class RegisterUserDto : UserBaseDto
+public class RegistrationFormDto : UserBaseDto
 {
     [Required(ErrorMessage = "Требуется регистрационный код")]
     [DataType(DataType.Password)]

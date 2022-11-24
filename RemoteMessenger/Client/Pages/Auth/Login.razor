@@ -37,12 +37,7 @@
 		</div>
 		@if (isError) {<span style="color: red">@_loginErrorMessage</span>}
 	</EditForm>
-	
-	
-
-<button @onclick="LogUsername">Log username</button>
-
-<p>@authMessage</p>
+	<p>@authMessage</p>
 
 
 </div>
@@ -81,20 +76,6 @@
 	}
 
 	private string authMessage;
-
-	private async Task LogUsername()
-	{
-		var authState = await authenticationStateTask;
-		var user = authState.User;
-		if (user.Identity.IsAuthenticated)
-		{
-			authMessage = $"{user.FindFirst(claim => claim.Type == "name")} is authenticated.";
-		}
-		else
-		{
-			authMessage = "The user is NOT authenticated.";
-		}
-	}
 
 	protected override async void OnInitialized()
 	{

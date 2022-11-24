@@ -22,14 +22,20 @@ public class MessengerAuthStateProvider : AuthenticationStateProvider
             NotifyAuthenticationStateChanged(Task.FromResult(AnonymousState));
             return AnonymousState;
         }
-        var identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+
+        var claims = ParseClaimsFromJwt(token);
+        var identity = new ClaimsIdentity(claims, "jwt");
         var user = new ClaimsPrincipal(identity);
         var state = new AuthenticationState(user);
         
         NotifyAuthenticationStateChanged(Task.FromResult(state));
         return state;
     }
-    
+
+    public string GetUniqueName(AuthenticationState state)
+    {
+        return state.User.Claims.First(x => x.Type == "unique_name").Value;
+    }
     public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
         var payload = jwt.Split('.')[1];
