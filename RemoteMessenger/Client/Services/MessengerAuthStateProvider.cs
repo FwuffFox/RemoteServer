@@ -32,16 +32,23 @@ public class MessengerAuthStateProvider : AuthenticationStateProvider
         return state;
     }
 
+    public async void LogOut()
+    {
+        await _jwtManager.DeleteJwt();
+        await GetAuthenticationStateAsync();
+    }
+    
     public string GetUniqueName(AuthenticationState state)
     {
         return state.User.Claims.First(x => x.Type == "unique_name").Value;
     }
-    public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    
+    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
         var payload = jwt.Split('.')[1];
         var jsonBytes = ParseBase64WithoutPadding(payload);
         var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-        return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+        return keyValuePairs!.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!));
     }
 
     private static byte[] ParseBase64WithoutPadding(string base64)

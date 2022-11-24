@@ -74,6 +74,13 @@
 			</button>
 		</div>
 	</EditForm>
+	<div class="link_button center_vertical">
+    	<button tabindex="8" class="img_buttons" @onclick="@(() => {NavigationManager.NavigateTo("/auth/login");})">
+    		<div id="buttons">
+    			<div class="text_buttons">Войти</div>
+    		</div>
+    	</button>
+    </div>
 </div>		
 
 @code {

@@ -1,5 +1,7 @@
 ﻿@page "/"
 @attribute [Authorize]
+@using RemoteMessenger.Client.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Index</PageTitle>
 
 <h1>hey!</h1>
@@ -12,6 +14,11 @@
         @foreach (var claim in context.User.Claims)
         {
             <span> @claim.Type: @claim.Value</span><br/>
+        }
+        <button @onclick="@LogOut">Logout</button>
+        @functions
+        {
+            void LogOut(){var a = (MessengerAuthStateProvider) AuthenticationStateProvider; a.LogOut();}
         }
     </Authorized>
 </AuthorizeView>

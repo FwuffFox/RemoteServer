@@ -1,16 +1,15 @@
 @page "/chatroom"
+@attribute [Authorize]
 @using Microsoft.AspNetCore.SignalR.Client
 @using RemoteMessenger.Client.Services
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IJSRuntime Js
-@attribute [Authorize]
 <PageTitle>General Chat</PageTitle>
 
 
 <div class="alert alert-secondary mt-4" role="alert">
     <span class="oi oi-person mr-2" aria-hidden="true"></span>
     <span>You are connected as <b>@_username</b></span>
-    <button class="btn btn-sm btn-warning ml-md-auto" @onclick="@DisconnectAsync">Disconnect</button>
 </div>
 
 <div id="scrollbox">
@@ -47,9 +46,9 @@
     private string _newMessage;
 
     // list of messages in chat
-    private List<Message> _messages = new List<Message>();
+    private readonly List<Message> _messages = new();
 
-    private string _hubUrl;
+    private readonly string _hubUrl = "https://localhost:5001/general_chat";
     private HubConnection _hubConnection;
     
     [CascadingParameter]
@@ -73,8 +72,6 @@
             // remove old messages if any
             _messages.Clear();
 
-            _hubUrl = "https://localhost:5001/general_chat";
-
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(_hubUrl)
                 .Build();
@@ -97,23 +94,8 @@
         bool isMine = name.Equals(_username, StringComparison.OrdinalIgnoreCase);
 
         _messages.Add(new Message(name, message, isMine));
-
-        // Inform blazor the UI needs updating
+        
         StateHasChanged();
-    }
-
-    private async Task DisconnectAsync()
-    {
-        if (_isChatting)
-        {
-            await SendAsync($"[Notice] {_username} left chat room.");
-
-            await _hubConnection.StopAsync();
-            await _hubConnection.DisposeAsync();
-
-            _hubConnection = null;
-            _isChatting = false;
-        }
     }
 
     private async Task SendAsync(string message)

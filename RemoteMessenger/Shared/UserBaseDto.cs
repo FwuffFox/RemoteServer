@@ -13,6 +13,11 @@ public class UserBaseDto
         get => _username;
         set
         {
+            if (value.Length == 0)
+            {
+                _username = "@";
+                return;
+            } 
             if (value[0] != '@') value = value.Insert(0, "@");
             _username = value.ToLower();
         }

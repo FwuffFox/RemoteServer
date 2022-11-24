@@ -31,4 +31,9 @@ public class JwtManager
     {
         await _storage.SetAsync("Jwt", jwt);
     }
+
+    public async Task DeleteJwt()
+    {
+        await _storage.DeleteAsync("Jwt");
+    }
 }

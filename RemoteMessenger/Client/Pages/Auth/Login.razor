@@ -35,18 +35,26 @@
 				</div>
 			</button>
 		</div>
-		@if (isError) {<span style="color: red">@_loginErrorMessage</span>}
+		@if (_isError) {<span style="color: red">@_loginErrorMessage</span>}
 	</EditForm>
-	<p>@authMessage</p>
-
-
+	<div class="link_button center_vertical">
+		<button tabindex="3" class="img_buttons" @onclick="@NavigateToReg">
+			<div id="buttons">
+				<div class="text_buttons">Регистрация</div>
+			</div>
+		</button>
+		@functions
+		{
+			void NavigateToReg() => NavigationManager.NavigateTo("/auth/register");
+		}
+    </div>
 </div>
 
 @code {
 	private class LoginValidationModel : LoginUserDto {}
 	private readonly LoginValidationModel _loginValidationModel = new();
-	private string _loginErrorMessage;
-	private bool isError;
+	private string _loginErrorMessage = string.Empty;
+	private bool _isError = false;
 	
 	[CascadingParameter]
 	private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -64,7 +72,7 @@
 		{
 			await Js.InvokeAsync<object>("console.error", result.StatusCode);
 			_loginErrorMessage = await result.Content.ReadAsStringAsync();
-			isError = true;
+			_isError = true;
 			return;
 		}
 		var token = await result.Content.ReadAsStringAsync();
@@ -74,8 +82,6 @@
 		await masp.GetAuthenticationStateAsync();
 		NavigationManager.NavigateTo("/");
 	}
-
-	private string authMessage;
 
 	protected override async void OnInitialized()
 	{
