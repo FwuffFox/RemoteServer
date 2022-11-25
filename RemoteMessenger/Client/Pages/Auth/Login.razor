@@ -51,7 +51,7 @@
 </div>
 
 @code {
-	private class LoginValidationModel : LoginUserDto {}
+	private class LoginValidationModel : LoginUserFormDto {}
 	private readonly LoginValidationModel _loginValidationModel = new();
 	private string _loginErrorMessage = string.Empty;
 	private bool _isError = false;

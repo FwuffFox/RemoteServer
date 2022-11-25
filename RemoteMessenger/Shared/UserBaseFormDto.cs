@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RemoteMessenger.Shared;
 
-public class UserBaseDto
+public class UserBaseFormDto
 {
     private string _username = string.Empty;
 

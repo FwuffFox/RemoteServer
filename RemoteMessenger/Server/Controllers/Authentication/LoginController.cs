@@ -25,7 +25,7 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost(Name = "Login")]
-    public async Task<ActionResult<string>> Login(LoginUserDto request)
+    public async Task<ActionResult<string>> Login(LoginUserFormDto request)
     {
         var user = await _userService.GetUserAsync(request.Username);
         if (user is null) 

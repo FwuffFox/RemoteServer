@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Models;
 using RemoteMessenger.Server.Services;
+using RemoteMessenger.Server.Services.SignalR;
 using RemoteMessenger.Server.Util;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +54,7 @@ builder.Services.AddDbContext<MessengerContext>(
     optionsLifetime: ServiceLifetime.Singleton);
 builder.Services.AddSingleton<UserService>();
 
+builder.Services.AddSingleton<IUserIdProvider, JwtUniqueNameBasedProvider>();
 builder.Services.AddSignalR();
 
 // Initialize JwtTokenManager

@@ -36,17 +36,19 @@
 			<label class="text-field__label" style="opacity: 1;" for="date">Дата рождения</label>
 			<ValidationMessage For="@(() => _registerForm.DateOfBirth)" />
 		</div>
-		<div class="text-field form_radio_group">
-			<div class="form_radio_group-item">
-				<input id="man" type="radio" name="name" @bind-value="@_registerForm.Gender">
-				<label for="man">Муж</label>
-			</div>
-			<div class="form_radio_group-item">
-				<input id="wom" type="radio" name="name" @bind-value="@_registerForm.Gender">
-				<label for="wom">Жен</label>
-			</div>
-			<ValidationMessage For="@(() => _registerForm.Gender)" />
-		</div>
+		<InputRadioGroup Name="Gender" @bind-Value="@_registerForm.Gender">
+			<div class="text-field form_radio_group">
+            	<div class="form_radio_group-item">
+	                <InputRadio id="man" type="radio" Name="Gender" Value="@Genders.Male"/>
+            		<label for="man">Муж</label>
+            	</div>
+            	<div class="form_radio_group-item">
+	                <InputRadio id="wom" type="radio" Name="Gender" Value="@Genders.Female"/>
+            		<label for="wom">Жен</label>
+            	</div>
+            	<ValidationMessage For="@(() => _registerForm.Gender)" />
+            </div>
+		</InputRadioGroup>
 		<div class="text-field text-field_floating">
 			<input tabindex="5" class="text-field__input" type="text" id="post" placeholder=" "
 			       @bind-value="@_registerForm.JobTitle">

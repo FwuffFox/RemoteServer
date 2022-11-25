@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace RemoteMessenger.Server;
 
+[Authorize]
 public class GeneralChatHub : Hub
 {
     public const string HubUrl = "/general_chat";

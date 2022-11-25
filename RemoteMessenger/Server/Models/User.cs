@@ -41,8 +41,7 @@ public sealed class User
         get => _gender;
         set
         {
-            value = value.ToLower();
-            _gender = value is "male" or "female" ? value : "undefined";
+            _gender = value is Genders.Male or Genders.Female ? value : "Undefined";
         }
     }
     
