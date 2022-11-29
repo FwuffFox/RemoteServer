@@ -40,7 +40,7 @@ public class MessengerAuthStateProvider : AuthenticationStateProvider
     
     public string GetUniqueName(AuthenticationState state)
     {
-        return state.User.Claims.First(x => x.Type == "unique_name").Value;
+        return state.User.FindFirst("unique_name")?.Value!;
     }
     
     private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)

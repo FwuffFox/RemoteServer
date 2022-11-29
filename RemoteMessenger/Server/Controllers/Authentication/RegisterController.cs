@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
+using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers;
 

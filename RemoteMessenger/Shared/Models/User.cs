@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
 
-namespace RemoteMessenger.Server.Models;
+namespace RemoteMessenger.Shared.Models;
 
 public sealed class User
 {

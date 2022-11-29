@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Models;
+using RemoteMessenger.Server.Hubs;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
 using RemoteMessenger.Server.Util;
@@ -86,11 +87,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/public_key", () => RSAEncryption.ServerPublicRSAKeyBase64);
-app.MapGet("/encrypt/{encryptedString}",
-    RSAEncryption.Decrypt_Base64);
+    
 app.MapGet("/validate_jwt",
-    async ([FromQuery] string jwt, HttpContext context) =>
+    async ([FromQuery] string jwt) =>
     {
         var res = await JwtTokenManager.ValidateToken(jwt);
         return res.IsValid;
@@ -98,9 +97,8 @@ app.MapGet("/validate_jwt",
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapGet("/check_auth", [Authorize] (HttpContext context) => "Authenticated");
-    app.MapGet("/check_auth_admin", [Authorize(Roles = Roles.Admin)] (HttpContext context)
-        => "Authenticated as Admin");
+    app.MapGet("/auth/check_auth", [Authorize] () => "Authenticated");
+    app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)] () => "Authenticated as Admin");
 }
 
 app.MapPost("/add_register_code", 
@@ -109,4 +107,5 @@ app.MapPost("/add_register_code",
         await userService.CreateRegistrationCodeAsync(new RegistrationCode {Code = code.Code, Role = code.Role});
     });
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
+app.MapHub<DirectMessagesHub>(DirectMessagesHub.HubUrl);
 app.Run();

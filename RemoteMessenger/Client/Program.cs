@@ -14,9 +14,9 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddAuthorizationCore();
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped(sp => new HttpClient
+builder.Services.AddScoped(_ => new HttpClient
 {
-    BaseAddress = new Uri(builder.Configuration["ServerAdress"])
+    BaseAddress = new Uri(builder.Configuration["ServerAddress"])
 });
 var app = builder.Build();
 
