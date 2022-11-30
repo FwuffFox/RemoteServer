@@ -48,11 +48,23 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Initialize DataBase services
-var connectionString = builder.Configuration["Database"] ?? "";
-builder.Services.AddDbContext<MessengerContext>(
-    optionsAction: op => op.UseNpgsql(connectionString),
-    contextLifetime: ServiceLifetime.Singleton,
-    optionsLifetime: ServiceLifetime.Singleton);
+var inMemory = builder.Configuration.GetValue<bool>("InMemory");
+if (inMemory) 
+{
+    builder.Services.AddDbContext<MessengerContext>(
+        optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb")
+    );
+}
+else
+{
+    var connectionString = builder.Configuration["Database"] ?? "";
+    builder.Services.AddDbContext<MessengerContext>(
+        optionsAction: op => op.UseNpgsql(connectionString),
+        contextLifetime: ServiceLifetime.Singleton,
+        optionsLifetime: ServiceLifetime.Singleton
+    );
+}
+
 builder.Services.AddSingleton<UserService>();
 
 builder.Services.AddSingleton<IUserIdProvider, JwtUniqueNameBasedProvider>();
@@ -75,6 +87,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+var database = app.Services.GetService<MessengerContext>();
+
+if (database.RegistrationCodes.Count == 0) 
+{
+    var code = new RegistrationCode(Code = "123", Role = "Admin");
+    database.RegistrationCodes.Add(code);
+    database.SaveChanges();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

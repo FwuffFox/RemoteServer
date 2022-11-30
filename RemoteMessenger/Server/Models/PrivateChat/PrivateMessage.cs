@@ -16,5 +16,7 @@ public class PrivateMessage
 
     public required User Receiver { get; set; }
 
+    public required string Body { get; set; }
+
     public required DateTime SendTime { get; set; }
 }
