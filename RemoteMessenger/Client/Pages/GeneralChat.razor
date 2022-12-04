@@ -10,43 +10,47 @@
 
 <PageTitle>General Chat</PageTitle>
 
-
-@if (_isChatting)
-{
-    <div class="alert alert-secondary mt-4" role="alert">
-        <span class="oi oi-person mr-2" aria-hidden="true"></span>
-        <span>You are connected as <b>@_username</b></span>
+<div class="vh-100">
+    <div class="app">
+        <div class="main-content">
+            <div class="header">
+                <h5 id="joinedRoom">Общий чат</h5>
+            </div>
+            <div id="message-container" class="messages-container position-relative">
+                @if (_messages.Any()) {<div class="no-messages-info"></div>}
+                <ul class="list-unstyled">
+                     @foreach (var item in _messages)
+                     {
+                         <li>
+                             <div class="message-item @item.CSS">
+                                 <img class="avatar avatar-lg mx-2" src="Icon.png" alt="@item.Username">
+                                 <div class="message-content">
+                                     <div class="message-info d-flex flex-wrap align-items-center">
+                                         <span class="author">@item.Username</span>
+                                         <span class="timestamp">@item.Date</span>
+                                     </div>
+                                     <div class="content">@item.Body</div>
+                                 </div>
+                             </div>
+                         </li>
+                         
+                     }                
+                </ul>
+            </div>
+            <form id="msg-input" class="message-input-container" @onsubmit="@(() => SendAsync(_newMessage))">
+                 <input placeholder="Введите сообщение" @bind="@_newMessage" @onkeydown="@(() => SendAsync(_newMessage))">
+                 <div class="actions d-flex align-items-center">
+                     <a id="btn-send-message" href="javascript: document.getElementById('msg-input').submit();" role="button" onclick="">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send">
+                             <line x1="22" y1="2" x2="11" y2="13"></line>
+                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                         </svg>
+                     </a>
+                 </div>
+            </form>
+        </div>
     </div>
-
-    <div id="scrollbox">
-        @foreach (var item in _messages)
-        {
-            @if (item.IsNotice)
-            {
-                <div class="alert alert-info">@item.Body</div>
-            }
-            else
-            {
-                <div class="@item.CSS">
-                    <div class="user">@item.Username</div>
-                    <div class="msg">@item.Body</div>
-                </div>
-            }
-        }
-        <hr />
-        <textarea class="input-lg" placeholder="enter your comment" @bind="@_newMessage" @onkeydown="@(() => SendAsync(_newMessage))"></textarea>
-        <button class="btn btn-default" @onclick="@(() => SendAsync(_newMessage))">Send</button>
-    </div>
-}
-else
-{
-    // Error messages
-    @if (_message != null)
-    {
-        <div class="invalid-feedback">@_message</div>
-        <small id="emailHelp" class="form-text text-muted">@_message</small>
-    }
-}
+</div>
 
 @code {
     // flag to indicate chat status
@@ -67,21 +71,9 @@ else
     private readonly string _hubEndpoint = "general_chat";
     
     private HubConnection _hubConnection;
-    
-    private IJSObjectReference? _module;
-    
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _module = await Js.InvokeAsync<IJSObjectReference>("import", 
-                "./Pages/GeneralChat.razor.js");
-        }
-    }
 
     public async Task Chat()
     {
@@ -114,10 +106,9 @@ else
     {
         bool isMine = name.Equals(_username, StringComparison.OrdinalIgnoreCase);
 
-        _messages.Add(new Message(name, message, isMine));
+        _messages.Add(new Message(name, message, isMine, DateTime.Now));
         
         StateHasChanged();
-        await _module!.InvokeVoidAsync("scrollToEnd");
     }
 
     private async Task SendAsync(string message)
@@ -129,25 +120,26 @@ else
 
             _newMessage = string.Empty;
         }
-        await _module!.InvokeVoidAsync("scrollToEnd");
     }
 
     private class Message
     {
-        public Message(string username, string body, bool mine)
+        public Message(string username, string body, bool mine, DateTime date)
         {
             Username = username;
             Body = body;
             Mine = mine;
+            Date = date;
         }
 
         public string Username { get; set; }
         public string Body { get; set; }
         public bool Mine { get; set; }
+        public DateTime Date { get; set; }
 
         public bool IsNotice => Body.StartsWith("[Notice]");
 
-        public string CSS => Mine ? "sent" : "received";
+        public string CSS => Mine ? "isMine" : "";
     }
 
     protected override async void OnInitialized()
@@ -155,18 +147,19 @@ else
         var authState = await authenticationStateTask;
         var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
         _username = messengerAuthState.GetUniqueName(authState);
+        await Js.InvokeAsync<string>("console.log", _username);
         var messages = await HttpClient.GetFromJsonAsync<List<PublicMessage>>($"/messages/general/100");
+        await Js.InvokeAsync<Message[]>("console.log", messages);
         if (messages is not null)
         {
             foreach (var message in messages)
             {
-                var isMine = message.Sender.Username == _username;
-                _messages.Add(new Message(message.Sender.Username, message.Body, isMine));
+                var sender = message.Sender;
+                var isMine = sender.Username == _username;
+                _messages.Add(new Message(message.Sender.Username, message.Body, isMine, message.SendTime));
             }
         }
-        await Js.InvokeAsync<string>("console.log", _username);
         await Chat();
-        await _module!.InvokeVoidAsync("scrollToEnd");
         await base.OnInitializedAsync();
     }
 }

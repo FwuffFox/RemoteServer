@@ -87,14 +87,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-var database = app.Services.GetService<MessengerContext>();
-
-if (database.RegistrationCodes.Count == 0) 
-{
-    var code = new RegistrationCode(Code = "123", Role = "Admin");
-    database.RegistrationCodes.Add(code);
-    database.SaveChanges();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

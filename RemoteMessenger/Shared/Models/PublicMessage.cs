@@ -9,7 +9,7 @@ public class PublicMessage
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
-    public required User Sender { get; set; }
+    public User? Sender { get; set; }
     
     public required string Body { get; set; }
 

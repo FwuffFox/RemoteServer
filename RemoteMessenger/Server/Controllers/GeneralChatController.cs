@@ -4,9 +4,10 @@ using RemoteMessenger.Shared.Models;
 namespace RemoteMessenger.Server.Controllers;
 
 [Route("/messages/general")]
+[Authorize]
 public class GeneralChatController : ControllerBase
 {
-    private MessengerContext _context;
+    private readonly MessengerContext _context;
 
     public GeneralChatController(MessengerContext context)
     {
@@ -16,6 +17,11 @@ public class GeneralChatController : ControllerBase
     [HttpGet("{amount:int}")]
     public async Task<ActionResult< List<PublicMessage> >> GetLastMessages(int amount)
     {
-        return Ok(await Task.Run(() => _context.PublicMessages.OrderBy(x => x.Id).Take(amount)));
+        var result = await Task.Run(() =>
+            _context.PublicMessages
+            .Include(m => m.Sender)
+            .OrderByDescending(x => x.Id)
+            .Take(amount));
+        return Ok(result.Reverse());
     }
 }
