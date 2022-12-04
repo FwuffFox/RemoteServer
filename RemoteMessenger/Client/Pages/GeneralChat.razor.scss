@@ -4,6 +4,27 @@ $message-text-color: #333;
 $message-border-radius: 10px;
 $message-input-bg-color: #f5f5f5;
 
+.app {
+  display: flex;
+  height: 100vh;
+  justify-content: space-between;
+  background: white;
+
+  .sidebar {
+    width: 270px;
+    min-width: 270px;
+  }
+
+  .main-content {
+    flex-grow: 1;
+  }
+
+  .users-container {
+    width: 250px;
+    min-width: 250px;
+  }
+}
+
 .main-content {
   border-right: 1px solid #eee;
   display: flex;
@@ -41,6 +62,8 @@ $message-input-bg-color: #f5f5f5;
     overflow-y: auto;
     flex-grow: 1;
     padding: 10px;
+    display: flex;
+    flex-direction: column-reverse;
   }
 
   .no-messages-info {
@@ -61,7 +84,7 @@ $message-input-bg-color: #f5f5f5;
     background: $message-bg-color;
     padding: 7px 10px;
     border-radius: $message-border-radius;
-    max-width: 60%;
+    max-width: 100%;
 
     .author {
       font-size: 14px;
@@ -78,6 +101,7 @@ $message-input-bg-color: #f5f5f5;
       margin-top: 2px;
       line-height: 1.4;
       color: $message-text-color;
+      display: flex;
 
       img {
         max-width: 270px;
@@ -109,6 +133,7 @@ $message-input-bg-color: #f5f5f5;
 
     .content {
       color: white;
+      flex-direction: row-reverse;
     }
   }
 

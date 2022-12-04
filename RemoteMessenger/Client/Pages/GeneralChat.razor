@@ -16,7 +16,7 @@
             <div class="header">
                 <h5 id="joinedRoom">Общий чат</h5>
             </div>
-            <div id="message-container" class="messages-container position-relative">
+            <div id="messages-container" class="messages-container position-relative">
                 @if (_messages.Any()) {<div class="no-messages-info"></div>}
                 <ul class="list-unstyled">
                      @foreach (var item in _messages)
@@ -40,12 +40,12 @@
             <form id="msg-input" class="message-input-container" @onsubmit="@(() => SendAsync(_newMessage))">
                  <input placeholder="Введите сообщение" @bind="@_newMessage" @onkeydown="@(() => SendAsync(_newMessage))">
                  <div class="actions d-flex align-items-center">
-                     <a id="btn-send-message" href="javascript: document.getElementById('msg-input').submit();" role="button" onclick="">
+                     <button style="all: unset" id="btn-send-message" role="button" onclick="">
                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send">
                              <line x1="22" y1="2" x2="11" y2="13"></line>
                              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                          </svg>
-                     </a>
+                     </button>
                  </div>
             </form>
         </div>
