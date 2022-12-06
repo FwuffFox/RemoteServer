@@ -1,10 +1,8 @@
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
-using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Shared.Models;
 
-namespace RemoteMessenger.Server.Controllers;
+namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
 [Route("api/auth/register")]
@@ -38,7 +36,7 @@ public class RegisterController : ControllerBase
             DateOfBirth = request.DateOfBirth,
         };
         await user.SetPassword(request.Password);
-        await _userService.CreateUser(user, registerCode);
+        await _userService.CreateUserAsync(user, registerCode);
         
         return Ok("User was registered");
     }

@@ -36,7 +36,7 @@ public class UserService
     public async Task<bool> IsUsernameTaken(string username)
         => await _context.Users.AnyAsync(user => user.Username == username);
 
-    public async Task CreateUser(User user, RegistrationCode code)
+    public async Task CreateUserAsync(User user, RegistrationCode code)
     {
         _context.RegistrationCodes.Remove(code);
         await _context.Users.AddAsync(user);

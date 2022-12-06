@@ -1,14 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
-using RemoteMessenger.Shared;
 
-namespace RemoteMessenger.Server.Controllers;
+namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
 [Route("api/auth/login")]

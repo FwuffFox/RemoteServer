@@ -56,7 +56,7 @@ public sealed class User
 
     public async Task<bool> IsPasswordValidAsync(string password)
     {
-        using var hmac = new HMACSHA512(PasswordSalt);
+        using var hmac = new HMACSHA512(key: PasswordSalt);
         var passStream = new MemoryStream(Encoding.UTF8.GetBytes(password));
         var computeHash = await hmac.ComputeHashAsync(passStream);
         return computeHash.SequenceEqual(PasswordHash);
