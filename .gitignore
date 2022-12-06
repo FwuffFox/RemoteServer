@@ -13,3 +13,4 @@ riderModule.iml
 
 # remove autogen css
 GeneralChat.razor.css
+ProfilePage.razor.css

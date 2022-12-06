@@ -10,18 +10,23 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
+            <NavLink class="nav-link" href="profile" Match="NavLinkMatch.Prefix">
+                <span class="oi oi-person" aria-hidden="true"></span> Профиль
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true"></span> Домашняя страница
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="chats">
-                <span class="oi oi-envelope-closed" aria-hidden="true"></span> Chats
+                <span class="oi oi-envelope-closed" aria-hidden="true"></span> Чаты
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="chatroom">
-                <span class="oi oi-chat" aria-hidden="true"></span> Chat room
+                <span class="oi oi-chat" aria-hidden="true"></span> Общий чат
             </NavLink>
         </div>
     </nav>

@@ -4,7 +4,6 @@ using RemoteMessenger.Shared.Models;
 namespace RemoteMessenger.Server.Controllers;
 
 [Route("/messages/general")]
-[Authorize]
 public class GeneralChatController : ControllerBase
 {
     private readonly MessengerContext _context;

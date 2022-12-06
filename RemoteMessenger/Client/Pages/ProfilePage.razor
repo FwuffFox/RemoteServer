@@ -1,13 +1,65 @@
-@page "/profile/{username}"
-<h3>ProfilePage</h3>
-
-<h1>@Username</h1>
-
+@page "/profile/{username?}"
+@using RemoteMessenger.Client.Services
+@using RemoteMessenger.Shared.Models
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+<PageTitle>@Username</PageTitle>
+@if (_user is null) {<h1>Loading</h1>}
+else
+{
+	<div class="profile-container">
+		<div class="oval"></div>
+		<img class="avatar avatar-xl mx-2" src="Icon.png" alt="@_user.Username">
+		
+		<h1>@_user.FullName</h1>
+		<h5>@_user.Username</h5>
+		<h3>@_user.JobTitle</h3>
+		@if (_isMyProfile)
+		{
+			<button class="btn-primary" @onclick="@LogOut">Logout</button>
+		}
+        @functions
+        {
+            void LogOut(){var a = (MessengerAuthStateProvider) AuthenticationStateProvider; a.LogOut();}
+        }
+	</div>
+}
 @code {
     [Parameter] public string? Username { get; set; }
+    private string _myUsername;
+    private bool _isMyProfile;
+    private bool _doesNotExist;
+	private User? _user;
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
     
     protected override async void OnInitialized()
     {
-    
+        var authState = await authenticationStateTask;
+        var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
+        _myUsername = messengerAuthState.GetUniqueName(authState);
+        if (Username is null || Username.Length == 0)
+        {
+            NavigationManager.NavigateTo($"/profile/{_myUsername}");
+	        Username = _myUsername;
+	        StateHasChanged();
+        }
+        if (Username[0] != '@')
+        {
+            Username = Username.Insert(0, "@");
+        }
+        _isMyProfile = Username == _myUsername;
+	    var responseMessage = await HttpClient.GetAsync($"/api/user?username={Username}");
+	    if (!responseMessage.IsSuccessStatusCode)
+	    {
+		    _doesNotExist = true;
+		    return;
+	    }
+	    _user = await responseMessage.Content.ReadFromJsonAsync<User>();
+	    await base.OnInitializedAsync();
+	    StateHasChanged();
     }
 }

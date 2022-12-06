@@ -15,10 +15,5 @@
         {
             <span> @claim.Type: @claim.Value</span><br/>
         }
-        <button @onclick="@LogOut">Logout</button>
-        @functions
-        {
-            void LogOut(){var a = (MessengerAuthStateProvider) AuthenticationStateProvider; a.LogOut();}
-        }
     </Authorized>
 </AuthorizeView>
