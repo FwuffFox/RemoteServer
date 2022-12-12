@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using RemoteMessenger.Server.Models.PrivateChat;
 using RemoteMessenger.Server.Util;
+using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers;
 
@@ -14,12 +14,14 @@ public class PrivateChatsController : ControllerBase
     {
         _context = context;
     }
-
+    
+    [HttpGet("getMyChats")]
     public async Task<ActionResult<List<PrivateChat>>> GetMyChats()
     {
         var username = await HttpContext.User.GetUniqueNameAsync();
         var result =
             await Task.Run(() => _context.PrivateChats
+                .Include(chat => chat.Messages)
                 .Where(chat => chat.IsUserInChat(username).Result)
                 .OrderBy(chat => chat.Id)
                 .ToList());
@@ -35,4 +37,18 @@ public class PrivateChatsController : ControllerBase
         if (!await chat.IsUserInChat(username)) return Unauthorized("User is not in chat");
         return Ok(chat.Messages);
     }
+    
+    [HttpGet("{username}")]
+    public async Task<ActionResult<List<PrivateMessage>>> GetPrivateMessages(string username)
+    {
+        var myUsername = await HttpContext.User.GetUniqueNameAsync();
+        var chat = await _context.PrivateChats.FirstOrDefaultAsync(
+            chat => chat.FirstUser.Username == username ||  chat.SecondUser.Username == username
+            && chat.FirstUser.Username == myUsername ||  chat.SecondUser.Username == myUsername);
+        if (chat is null) return NotFound("No such chat exists");
+        if (!await chat.IsUserInChat(myUsername)) return BadRequest("User is not in chat");
+        return Ok(chat.Messages);
+    }
+    
+    // TODO: New DMS Controller
 }

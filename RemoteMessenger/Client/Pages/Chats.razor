@@ -1,12 +1,38 @@
 ﻿@page "/chats"
+@using RemoteMessenger.Shared.Models
+@using RemoteMessenger.Client.Services
 @attribute [Authorize]
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Chats</PageTitle>
 
-@for (int i = 0; i < 10; i++)
+@foreach (var chat in PrivateChats)
 {
-    var isOnline = i % 2 == 0;
-    var message = isOnline ? "Онлайн" : "Оффлайн";
-    <Contact Name=@($"Мужик {i}") LastMessage=@($"Я {message} мужик {i}") IsOnline=@isOnline
-    ImageSrc="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/09f66320974015.562f438db41be.jpg"></Contact>
+    var othername = chat.FirstUser.Username == _myUsername ? chat.SecondUser.Username : chat.FirstUser.Username;
+    <Contact ImageSrc="Icon.png" Name="@othername"></Contact>
+}
+
+@code {
+
+    public List<PrivateChat> PrivateChats = new();
+    private string _myUsername;
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
+        _myUsername = messengerAuthState.GetUniqueName(authState);
+        var result = await HttpClient.GetAsync($"/api/private_chats/getMyChats");
+        if (!result.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("Error");
+        }
+        PrivateChats = (await result.Content.ReadFromJsonAsync<List<PrivateChat>>())!;
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
 }

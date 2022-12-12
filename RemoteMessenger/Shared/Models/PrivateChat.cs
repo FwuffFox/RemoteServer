@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using RemoteMessenger.Shared.Models;
 
-namespace RemoteMessenger.Server.Models.PrivateChat;
+namespace RemoteMessenger.Shared.Models;
 
 public class PrivateChat
 {

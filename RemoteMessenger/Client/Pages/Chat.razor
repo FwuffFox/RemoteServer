@@ -1,14 +1,13 @@
-@page "/chatroom"
+@page "/chats/{username?}"
 @attribute [Authorize]
-@using Microsoft.AspNetCore.SignalR.Client
 @using RemoteMessenger.Client.Services
+@using Microsoft.AspNetCore.SignalR.Client
 @using RemoteMessenger.Shared.Models
+@using System.Net
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject JwtManager JwtManager
 @inject HttpClient HttpClient
-@inject IJSRuntime Js
+@inject JwtManager JwtManager
 
-<PageTitle>General Chat</PageTitle>
 
 <div class="vh-100">
     <div class="app">
@@ -53,30 +52,27 @@
 </div>
 
 @code {
-    // flag to indicate chat status
+    [Parameter] public string? Username { get; set; }
+
+    private List<Message> _messages = new();
+    
+    private string _myUsername;
+    
     private bool _isChatting;
-
-    // name of the user who will be chatting
-    private string _username;
-
-    // new message input
-    private string _newMessage;
-
-    // list of messages in chat
-    private readonly List<Message> _messages = new();
-        
-        private const string _hubEndpoint = "general_chat";
-
+    
     private HubConnection _hubConnection;
+
+    private string _hubEndpoint = "private_chat";
+    
+    private string? _newMessage;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private async Task Chat()
+    private async Task StartChatting()
     {
         try
         {
-            // Start chatting and force refresh UI.
             _isChatting = true;
             await Task.Delay(1);
             StateHasChanged();
@@ -88,7 +84,7 @@
                 })
                 .Build();
 
-            _hubConnection.On<string, string>("Broadcast", BroadcastMessage);
+            _hubConnection.On<string, string>("SendMessage", ReceiveMessage);
 
             await _hubConnection.StartAsync();
         }
@@ -99,9 +95,9 @@
         }
     }
 
-    private async void BroadcastMessage(string name, string message)
+    private void ReceiveMessage(string name, string message)
     {
-        bool isMine = name.Equals(_username, StringComparison.OrdinalIgnoreCase);
+        bool isMine = name.Equals(_myUsername, StringComparison.OrdinalIgnoreCase);
 
         _messages.Add(new Message(name, message, isMine, DateTime.Now));
         
@@ -112,11 +108,47 @@
     {
         if (_isChatting && !string.IsNullOrWhiteSpace(message))
         {
-            await Js.InvokeAsync<string>("console.log", "ShouldSend");
-            await _hubConnection.SendAsync("Broadcast", _username, message);
+            //await Js.InvokeAsync<string>("console.log", "ShouldSend");
+            await _hubConnection.SendAsync("SendMessage", Username, message);
 
             _newMessage = string.Empty;
         }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
+        _myUsername = messengerAuthState.GetUniqueName(authState);
+        var response = await HttpClient.GetAsync(($"/api/private_chats/{Username}"));
+        if (response.IsSuccessStatusCode)
+        {
+            var messages = await response.Content.ReadFromJsonAsync<List<PrivateMessage>>();
+            if (messages is not null)
+            {
+                foreach (var message in messages)
+                {
+                    var sender = message.Sender;
+                    var isMine = sender.Username == _myUsername;
+                    _messages.Add(new Message(message.Sender.Username, message.Body, isMine, message.SendTime));
+                }
+            }
+        }
+        else
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                NavigationManager.NavigateTo("/chats");
+                return;
+            }
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // TODO: Create new dms'
+            }
+        }
+        await StartChatting();
+        await base.OnInitializedAsync();
+        StateHasChanged();
     }
 
     private class Message
@@ -133,27 +165,9 @@
         public string Body { get; set; }
         public bool Mine { get; set; }
         public DateTime Date { get; set; }
-        
-        public string CSS => Mine ? "isMine" : "";
-    }
 
-    protected override async void OnInitialized()
-    {
-        var authState = await authenticationStateTask;
-        var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
-        _username = messengerAuthState.GetUniqueName(authState);
-        await Js.InvokeAsync<string>("console.log", _username);
-        var messages = await HttpClient.GetFromJsonAsync<List<PublicMessage>>($"/messages/general/100");
-        if (messages is not null)
-        {
-            foreach (var message in messages)
-            {
-                var sender = message.Sender;
-                var isMine = sender.Username == _username;
-                _messages.Add(new Message(message.Sender.Username, message.Body, isMine, message.SendTime));
-            }
-        }
-        await Chat();
-        await base.OnInitializedAsync();
+        public bool IsNotice => Body.StartsWith("[Notice]");
+
+        public string CSS => Mine ? "isMine" : "";
     }
 }

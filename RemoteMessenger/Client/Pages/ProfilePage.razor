@@ -2,9 +2,9 @@
 @using RemoteMessenger.Client.Services
 @using RemoteMessenger.Shared.Models
 @attribute [Authorize]
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <PageTitle>@Username</PageTitle>
 @if (_user is null) {<h1>Loading</h1>}
 else

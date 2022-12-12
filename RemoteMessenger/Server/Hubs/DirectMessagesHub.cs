@@ -18,11 +18,11 @@ public class DirectMessagesHub : Hub
         get => Context.User?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value!;
     }
     
-    public async Task SendPrivateMessage(string receiver, string message)
+    public async Task SendMessage(string receiver, string message)
     {
         var receiverUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == receiver);
         if (receiverUser is null) return;
-        await Clients.User(receiver).SendAsync("GetMessage");
+        await Clients.User(receiver).SendAsync("ReceiveMessage");
     }
     
     

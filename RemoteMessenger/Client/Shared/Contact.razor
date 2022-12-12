@@ -1,12 +1,18 @@
 @using System.ComponentModel.DataAnnotations
-<div class="contact">
-    <img class=@ImageClassName() src=@ImageSrc />
+<div class="contact" @onclick="@OnClick">
+    <img class="@ImageClassName()" src="@ImageSrc" />
     <strong>@Name</strong>
     <br />
     <span>@LastMessage</span>
 </div>
 
 @code {
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo($"/chats/{Name}");
+    }
+    
     [Parameter]
     [Required]
     public string? ImageSrc { get; set; }
