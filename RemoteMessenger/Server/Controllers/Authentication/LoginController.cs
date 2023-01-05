@@ -5,7 +5,7 @@ using RemoteMessenger.Server.Util;
 namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
-[Route("api/auth/login")]
+[Route("auth/login")]
 public class LoginController : ControllerBase
 {
     private readonly ILogger<LoginController> _logger;

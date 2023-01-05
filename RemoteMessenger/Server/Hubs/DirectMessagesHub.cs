@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
 namespace RemoteMessenger.Server.Hubs;
@@ -15,15 +15,14 @@ public class DirectMessagesHub : Hub
     
     private string IdentityName
     {
-        get => Context.User?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value!;
+        get => Context.User?.FindFirst(ClaimTypes.Name)?.Value!;
     }
     
-    public async Task SendMessage(string receiver, string message)
+    public async Task Broadcast(string receiver, string message)
     {
         var receiverUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == receiver);
         if (receiverUser is null) return;
-        await Clients.User(receiver).SendAsync("ReceiveMessage");
+        await Clients.All.SendAsync("Broadcast", IdentityName, message);
+        //await Clients.User(IdentityName).SendAsync("ReceiveMessage",IdentityName, message);
     }
-    
-    
 }

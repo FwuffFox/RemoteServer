@@ -20,7 +20,7 @@ public sealed class MessengerContext : DbContext
         modelBuilder.Entity<User>().ToTable("User");
         modelBuilder.Entity<RegistrationCode>().ToTable("Registration Code");
         modelBuilder.Entity<PrivateMessage>().ToTable("Private Message");
-        modelBuilder.Entity<Shared.Models.PrivateChat>().ToTable("Private Chat");
+        modelBuilder.Entity<PrivateChat>().ToTable("Private Chat");
         modelBuilder.Entity<PublicMessage>().ToTable("Public Message");
     }
 }

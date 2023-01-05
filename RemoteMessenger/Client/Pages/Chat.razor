@@ -7,13 +7,14 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient HttpClient
 @inject JwtManager JwtManager
+@inject IJSRuntime Js
 
 
 <div class="vh-100">
     <div class="app">
         <div class="main-content">
             <div class="header">
-                <h5 id="joinedRoom">Общий чат</h5>
+                <h5 id="joinedRoom">@Username</h5>
             </div>
             <div id="messages-container" class="messages-container position-relative">
                 @if (_messages.Any()) {<div class="no-messages-info"></div>}
@@ -84,7 +85,7 @@
                 })
                 .Build();
 
-            _hubConnection.On<string, string>("SendMessage", ReceiveMessage);
+            _hubConnection.On<string, string>("Broadcast", ReceiveMessage);
 
             await _hubConnection.StartAsync();
         }
@@ -95,7 +96,7 @@
         }
     }
 
-    private void ReceiveMessage(string name, string message)
+    private async void ReceiveMessage(string name, string message)
     {
         bool isMine = name.Equals(_myUsername, StringComparison.OrdinalIgnoreCase);
 
@@ -108,19 +109,22 @@
     {
         if (_isChatting && !string.IsNullOrWhiteSpace(message))
         {
-            //await Js.InvokeAsync<string>("console.log", "ShouldSend");
-            await _hubConnection.SendAsync("SendMessage", Username, message);
+            await Js.InvokeAsync<string>("console.log", "ShouldSend");
+            await _hubConnection.SendAsync("Broadcast", Username, message);
 
             _newMessage = string.Empty;
         }
     }
     
-    protected override async Task OnInitializedAsync()
+    protected override async void OnInitialized()
     {
+        await Js.InvokeAsync<string>("console.log", "Initializing");
+
         var authState = await authenticationStateTask;
         var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
         _myUsername = messengerAuthState.GetUniqueName(authState);
-        var response = await HttpClient.GetAsync(($"/api/private_chats/{Username}"));
+        var response = await HttpClient.GetAsync($"/api/private_chats/{Username}");
+        await Js.InvokeAsync<string>("console.log", response);
         if (response.IsSuccessStatusCode)
         {
             var messages = await response.Content.ReadFromJsonAsync<List<PrivateMessage>>();
@@ -136,14 +140,15 @@
         }
         else
         {
-            if (response.StatusCode == HttpStatusCode.BadRequest)
+            if (response.StatusCode == HttpStatusCode.Forbidden)
             {
                 NavigationManager.NavigateTo("/chats");
                 return;
             }
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                // TODO: Create new dms'
+                await Js.InvokeAsync<string>("console.log", "Requesting new chat");
+                await HttpClient.GetAsync($"/api/private_chats/create?username={Username}");
             }
         }
         await StartChatting();

@@ -7,9 +7,10 @@
 
 <PageTitle>Chats</PageTitle>
 
+<h1>В разработке!</h1>
 @foreach (var chat in PrivateChats)
 {
-    var othername = chat.FirstUser.Username == _myUsername ? chat.SecondUser.Username : chat.FirstUser.Username;
+    var othername = chat.Sender.Username == _myUsername ? chat.Receiver.Username : chat.Sender.Username;
     <Contact ImageSrc="Icon.png" Name="@othername"></Contact>
 }
 
@@ -23,16 +24,12 @@
     
     protected override async Task OnInitializedAsync()
     {
+    /*
         var authState = await authenticationStateTask;
         var messengerAuthState = (MessengerAuthStateProvider)AuthenticationStateProvider;
         _myUsername = messengerAuthState.GetUniqueName(authState);
-        var result = await HttpClient.GetAsync($"/api/private_chats/getMyChats");
-        if (!result.IsSuccessStatusCode)
-        {
-            NavigationManager.NavigateTo("Error");
-        }
-        PrivateChats = (await result.Content.ReadFromJsonAsync<List<PrivateChat>>())!;
-        await base.OnInitializedAsync();
-        StateHasChanged();
+        PrivateChats = (await HttpClient.GetFromJsonAsync<List<PrivateChat>>($"/api/private_chats/getMyChats"))!;
+        StateHasChanged(); */
+        await base.OnInitializedAsync(); 
     }
 }

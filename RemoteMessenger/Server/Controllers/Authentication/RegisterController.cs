@@ -5,7 +5,7 @@ using RemoteMessenger.Shared.Models;
 namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
-[Route("api/auth/register")]
+[Route("auth/register")]
 public class RegisterController : ControllerBase
 {
     private readonly UserService _userService;

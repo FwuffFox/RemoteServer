@@ -10,9 +10,9 @@ public class PrivateMessage
     public long Id { get; set; }
     
     public required PrivateChat Chat { get; set; }
-
+    
     public required User Sender { get; set; }
-
+    
     public required User Receiver { get; set; }
 
     public required string Body { get; set; }

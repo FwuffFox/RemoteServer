@@ -17,6 +17,8 @@ public static partial class Extensions
     
     public static async Task<string> GetUniqueNameAsync(this ClaimsPrincipal user)
     {
-        return await Task.Run(() => user.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value!);
+        var res = user.FindFirstValue(JwtRegisteredClaimNames.UniqueName);
+        res ??= user.FindFirstValue(ClaimTypes.Name);
+        return res!;
     }
 }

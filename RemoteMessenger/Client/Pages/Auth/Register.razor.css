@@ -57,11 +57,6 @@ h1 {
     -webkit-appearance: none;
 }
 
-.text-field__input::placeholder {
-    background-color: #212529;
-    opacity: 0.4; 
-}
-
 .text-field__input:focus {
     border-color: #bdbdbd;
     outline: 0;
