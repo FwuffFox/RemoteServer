@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Hubs;
 
-[Authorize]
+// TODO: Fix Authorization
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class GeneralChatHub : Hub
 {
     public const string HubUrl = "/general_chat";
@@ -18,10 +20,10 @@ public class GeneralChatHub : Hub
         _context = context;
     }
 
-    public async Task Broadcast(string username, string message)
+    public async Task SendMessage(string message, string username)
     {
         var user = await _userService.GetUserAsync(username);
-        if (user is null) return;
+        if (user is null) return; 
         var messageToAdd = new PublicMessage
         {
             Sender = user,
@@ -30,7 +32,7 @@ public class GeneralChatHub : Hub
         };
         await _context.PublicMessages.AddAsync(messageToAdd);
         await _context.SaveChangesAsync();
-        await Clients.All.SendAsync("Broadcast", username, message);
+        await Clients.All.SendAsync("SendMessage", username, message);
     }
 
     public override Task OnConnectedAsync()

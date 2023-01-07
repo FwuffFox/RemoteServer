@@ -32,9 +32,9 @@ public static class JwtTokenManager
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = _key,
-            ValidateAudience = true,
+            ValidateAudience = false, // TODO: FIX AUDIENCE!!!
             ValidAudience = Audience,
-            ValidateIssuer = true,
+            ValidateIssuer = false, // TODO: FIX ISSUER!!!
             ValidIssuer = Issuer,
             ValidateLifetime = true,
             ValidAlgorithms = new [] {SecurityAlgorithms.HmacSha512Signature}
