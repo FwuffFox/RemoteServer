@@ -1,3 +1,5 @@
+using RemoteMessenger.Shared.Models;
+
 namespace RemoteMessenger.Server.Models;
 
 public sealed class MessengerContext : DbContext
@@ -8,12 +10,17 @@ public sealed class MessengerContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<RegisterCode> RegisterCodes { get; set; } = null!;
-
+    public DbSet<RegistrationCode> RegistrationCodes { get; set; } = null!;
+    public DbSet<PrivateMessage> PrivateMessages { get; set; } = null!;
+    public DbSet<PrivateChat> PrivateChats { get; set; } = null!;
+    public DbSet<PublicMessage> PublicMessages { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("User");
-        modelBuilder.Entity<RegisterCode>().ToTable("Register Code");
+        modelBuilder.Entity<RegistrationCode>().ToTable("Registration Code");
+        modelBuilder.Entity<PrivateMessage>().ToTable("Private Message");
+        modelBuilder.Entity<PrivateChat>().ToTable("Private Chat");
+        modelBuilder.Entity<PublicMessage>().ToTable("Public Message");
     }
 }

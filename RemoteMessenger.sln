@@ -7,10 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteMessenger.Server", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteMessenger.Shared", "RemoteMessenger\Shared\RemoteMessenger.Shared.csproj", "{048DD926-2A32-45FC-85ED-A0BFF44035FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteMessenger.Client", "RemoteMessenger\Client\RemoteMessenger.Client.csproj", "{4D5DF961-2862-4F1B-AB82-5869F67F8D95}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteMessenger.Server.Tests", "RemoteMessenger\Server.Tests\RemoteMessenger.Server.Tests.csproj", "{BE8D0377-FF48-491C-9108-DC411DC231F8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,14 +21,6 @@ Global
 		{048DD926-2A32-45FC-85ED-A0BFF44035FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{048DD926-2A32-45FC-85ED-A0BFF44035FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{048DD926-2A32-45FC-85ED-A0BFF44035FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D5DF961-2862-4F1B-AB82-5869F67F8D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D5DF961-2862-4F1B-AB82-5869F67F8D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D5DF961-2862-4F1B-AB82-5869F67F8D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D5DF961-2862-4F1B-AB82-5869F67F8D95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE8D0377-FF48-491C-9108-DC411DC231F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE8D0377-FF48-491C-9108-DC411DC231F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE8D0377-FF48-491C-9108-DC411DC231F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE8D0377-FF48-491C-9108-DC411DC231F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

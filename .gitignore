@@ -5,11 +5,12 @@ generated_files/
 Migrations/
 riderModule.iml
 /_ReSharper.Caches/
-
-# Don't put Development appsettings into master
-*.Development.json
 *.db
 *.db-shm
 *.db-wal
 .idea/
 .vs/
+
+# remove autogen css
+GeneralChat.razor.css
+ProfilePage.razor.css
