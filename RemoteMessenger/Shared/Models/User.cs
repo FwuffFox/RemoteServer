@@ -35,19 +35,6 @@ public sealed class User
         set => _role = value is Roles.Admin ? value : Roles.User;
     }
     
-    private string _gender = string.Empty;
-    
-    public string Gender
-    {
-        get => _gender;
-        set
-        {
-            _gender = value is Genders.Male or Genders.Female ? value : "Undefined";
-        }
-    }
-    
-    public string DateOfBirth { get; set; } = string.Empty;
-    
     [JsonIgnore] // Secret data
     public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
 

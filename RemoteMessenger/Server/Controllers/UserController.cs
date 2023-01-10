@@ -5,7 +5,7 @@ using RemoteMessenger.Server.Services;
 
 namespace RemoteMessenger.Server.Controllers;
 
-[Route("user")]
+[Route("/user")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;

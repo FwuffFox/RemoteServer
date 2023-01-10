@@ -5,7 +5,7 @@ using RemoteMessenger.Server.Util;
 namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
-[Route("auth/login")]
+[Route("/auth/login")]
 public class LoginController : ControllerBase
 {
     private readonly ILogger<LoginController> _logger;
@@ -19,11 +19,11 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost(Name = "Login")]
-    public async Task<ActionResult<string>> Login(LoginUserFormDto request)
+    public async Task<ActionResult> Login(LoginUserFormDto request)
     {
         var user = await _userService.GetUserAsync(request.Username);
         if (user is null) 
-            return BadRequest($"User {request.Username} was not found");
+            return NotFound($"User {request.Username} was not found");
         
         if (!await user.IsPasswordValidAsync(request.Password))
             return BadRequest("Password is wrong");

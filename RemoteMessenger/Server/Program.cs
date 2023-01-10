@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Models;
@@ -113,11 +112,6 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)] () => "Authenticated as Admin");
 }
 
-app.MapPost("/add_register_code", 
-    [Authorize(Roles = Roles.Admin)] async (HttpContext context, UserService userService, RegistrationCodeDto code) =>
-    {
-        await userService.CreateRegistrationCodeAsync(new RegistrationCode {Code = code.Code, Role = code.Role});
-    });
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 app.MapHub<DirectMessagesHub>(DirectMessagesHub.HubUrl);
 app.Run();
