@@ -34,7 +34,14 @@ public sealed class User
         get => _role;
         set => _role = value is Roles.Admin ? value : Roles.User;
     }
-    
+
+    [JsonIgnore]
+    public List<PublicMessage> PublicMessages { get; set; } = new ();
+
+    [JsonIgnore]
+    public List<PrivateChat> PrivateChats { get; set; } = new();
+
+
     [JsonIgnore] // Secret data
     public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
 

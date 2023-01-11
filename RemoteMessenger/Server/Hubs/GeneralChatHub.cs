@@ -24,15 +24,15 @@ public class GeneralChatHub : Hub
     {
         var user = await _userService.GetUserAsync(username);
         if (user is null) return; 
-        var messageToAdd = new PublicMessage
+        var sentMessage = new PublicMessage
         {
             Sender = user,
             Body = message,
             SendTime = DateTime.UtcNow,
         };
-        await _context.PublicMessages.AddAsync(messageToAdd);
+        await _context.PublicMessages.AddAsync(sentMessage);
         await _context.SaveChangesAsync();
-        await Clients.All.SendAsync("SendMessage", username, message);
+        await Clients.All.SendAsync("ReceiveMessage", sentMessage);
     }
 
     public override Task OnConnectedAsync()

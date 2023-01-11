@@ -18,7 +18,7 @@ public class DirectMessagesHub : Hub
         get => Context.User?.FindFirst(ClaimTypes.Name)?.Value!;
     }
     
-    public async Task Broadcast(string receiver, string message)
+    public async Task SendMessage(string message, string receiver)
     {
         var receiverUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == receiver);
         if (receiverUser is null) return;
