@@ -51,7 +51,9 @@ var inMemory = builder.Configuration.GetValue<bool>("InMemory");
 if (inMemory) 
 {
     builder.Services.AddDbContext<MessengerContext>(
-        optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb")
+        optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb"),
+        contextLifetime: ServiceLifetime.Singleton,
+        optionsLifetime: ServiceLifetime.Singleton
     );
 }
 else
