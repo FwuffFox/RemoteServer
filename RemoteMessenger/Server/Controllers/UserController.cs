@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Models;
 using RemoteMessenger.Server.Services;
+using RemoteMessenger.Server.Util;
+using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers;
 
 [Route("/user")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -15,16 +18,23 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "Get User")]
+    [ProducesResponseType(StatusCodes.Status200OK,
+        Type = typeof(User))]
+    [ProducesResponseType(StatusCodes.Status404NotFound,
+        Type = typeof(string))]
     public async Task<IActionResult> GetUser([FromQuery] int? id = null, [FromQuery] string? username = null)
     {
-        if (id is null && username is null) return BadRequest("No query passed");
+        if (id is null && username is null)
+        {
+            username = await HttpContext.User.GetUniqueNameAsync();
+        }
         
         var user = id is not null ? 
             await _userService.GetUserAsync(id.Value) : 
             await _userService.GetUserAsync(username!);
         
-        if (user is null) return BadRequest("No such user");
+        if (user is null) return NotFound("No such user");
         return Ok(user);
     }
     

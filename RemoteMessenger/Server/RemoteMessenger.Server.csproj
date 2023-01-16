@@ -4,6 +4,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!--Disable documentation warnings.-->
+        <NoWarn>$(NoWarn);1591</NoWarn> 
     </PropertyGroup>
 
     <ItemGroup>

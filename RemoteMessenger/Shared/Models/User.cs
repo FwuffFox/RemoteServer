@@ -22,9 +22,9 @@ public sealed class User
             _username = value.ToLower();
         }
     }
-    
-    public string FullName { get; set; } = string.Empty;
 
+    public string Email { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
     
     private string _role = string.Empty;

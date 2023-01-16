@@ -1,50 +1,23 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.OpenApi.Models;
 using RemoteMessenger.Server.Hubs;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
+using RemoteMessenger.Server.Setup;
 using RemoteMessenger.Server.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(op =>
+{
+    op.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT Authorization header using the Bearer scheme. </br> 
-                      Enter 'Bearer' [space] and then your token in the text input below. </br>
-                      Example: 'Bearer 12345abcdef'",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
-
-            },
-            new List<string>()
-        }
-    });
-});
+builder.Services.AddSwagger();
 
 // Initialize DataBase services
 var inMemory = builder.Configuration.GetValue<bool>("InMemory");
@@ -93,7 +66,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(op =>
+    {
+        op.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        op.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseHttpsRedirection();
@@ -117,3 +94,6 @@ if (app.Environment.IsDevelopment())
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 app.MapHub<DirectMessagesHub>(DirectMessagesHub.HubUrl);
 app.Run();
+
+// WarmUp database
+var _ = app.Services.GetService<MessengerContext>()!.Users.FirstOrDefault();

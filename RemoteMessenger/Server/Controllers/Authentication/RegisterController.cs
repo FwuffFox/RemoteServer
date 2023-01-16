@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Services;
+using RemoteMessenger.Server.Util;
 using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers.Authentication;
@@ -16,22 +17,34 @@ public class RegisterController : ControllerBase
     }
 
     [HttpPost(Name = "RegisterUser")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Register(RegistrationFormDto request)
+    [ProducesResponseType(StatusCodes.Status200OK,
+        Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status409Conflict,
+        Type = typeof(Dictionary<string, string[]>))]
+    public async Task<ActionResult> Register(RegistrationFormDto requestBody)
     {
-        var usernameIsTaken = await _userService.IsUsernameTaken(request.Username);
-        if (usernameIsTaken) return BadRequest($"Username {request.Username} is taken");
+        var usernameIsTaken = await _userService.IsUsernameTaken(requestBody.Username);
+        if (usernameIsTaken) ModelState.AddModelError("username",
+            $"Имя пользователя {requestBody.Username} уже занято.");
+
+        var emailIsTaken = await _userService.IsEmailTaken(requestBody.Email);
+        if (emailIsTaken) ModelState.AddModelError("email",
+            "Данная электронная почта уже занята.");
+
+        if (!ModelState.IsValid) return Conflict(ModelState);
 
         var user = new User
         {
-            Username = request.Username.ToLower(),
-            FullName = request.FullName,
-            JobTitle = request.JobTitle,
+            Username = requestBody.Username,
+            Email = requestBody.Email,
+            FullName = requestBody.FullName,
+            JobTitle = requestBody.JobTitle,
         };
-        await user.SetPassword(request.Password);
+        await user.SetPassword(requestBody.Password);
         await _userService.CreateUserAsync(user);
+
+        var token = JwtTokenManager.IssueToken(user);
         
-        return Ok("User was registered");
+        return Ok(token);
     }
 }
