@@ -7,7 +7,7 @@ namespace RemoteMessenger.Server.Hubs;
 //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class GeneralChatHub : Hub
 {
-    public const string HubUrl = "/general_chat";
+    public const string HubUrl = "/hubs/general_chat";
     private readonly ILogger<GeneralChatHub> _logger;
     private readonly UserService _userService;
     private readonly MessengerContext _context;
@@ -30,7 +30,7 @@ public class GeneralChatHub : Hub
         };
         await _context.PublicMessages.AddAsync(sentMessage);
         await _context.SaveChangesAsync();
-        await Clients.All.SendAsync("ReceiveMessage", sentMessage);
+        await Clients.All.SendAsync("OnReceiveMessage", sentMessage);
     }
 
     public override async Task OnConnectedAsync()

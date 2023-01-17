@@ -6,7 +6,7 @@ namespace RemoteMessenger.Server.Hubs;
 [Authorize]
 public class DirectMessagesHub : Hub
 {
-    public const string HubUrl = "/private_chat";
+    public const string HubUrl = "/hubs/private_chat";
     private readonly MessengerContext _context;
     public DirectMessagesHub(MessengerContext context)
     {
