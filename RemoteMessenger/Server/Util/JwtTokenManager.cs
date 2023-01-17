@@ -1,9 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RemoteMessenger.Server.Models;
-using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Util;
 

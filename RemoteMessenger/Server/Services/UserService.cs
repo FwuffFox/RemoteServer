@@ -1,5 +1,3 @@
-using RemoteMessenger.Shared.Models;
-
 namespace RemoteMessenger.Server.Services;
 
 public class UserService 

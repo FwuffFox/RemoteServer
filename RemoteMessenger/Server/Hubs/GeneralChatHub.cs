@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Services;
-using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Hubs;
 
@@ -35,10 +33,16 @@ public class GeneralChatHub : Hub
         await Clients.All.SendAsync("ReceiveMessage", sentMessage);
     }
 
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         _logger.LogInformation($"{Context.ConnectionId} connected");
-        return base.OnConnectedAsync();
+        var lastMessages = await Task.Run(() =>
+            _context.PublicMessages
+                .Include(m => m.Sender)
+                .OrderByDescending(x => x.Id)
+                .Take(100));
+        await Clients.Caller.SendAsync("OnConnect", lastMessages.Reverse());
+        await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? e)

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers;
 

@@ -1,5 +1,3 @@
-using RemoteMessenger.Shared.Models;
-
 namespace RemoteMessenger.Server.Models;
 
 public sealed class MessengerContext : DbContext

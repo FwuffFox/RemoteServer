@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Util;
 

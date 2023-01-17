@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
-using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Controllers.Authentication;
 
