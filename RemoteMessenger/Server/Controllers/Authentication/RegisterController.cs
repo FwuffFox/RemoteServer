@@ -16,13 +16,34 @@ public class RegisterController : ControllerBase
         _userService = userService;
     }
 
+    /// <summary>
+    /// Регистрация
+    /// </summary>
+    /// <param name="requestBody">Данные для регистрации.</param>
+    /// <response code="200"> Пользователь успешно зарегистрирован. Возращает JWT
+    /// токен для дальнейшей аутентификации.</response>
+    /// <response code="400"> Пользователь не смог зарегистрироваться. Возращаем ошибки.</response>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     POST /auth/register
+    ///     {
+    ///         "username": "@user",
+    ///         "password": "password",
+    ///         "email": email@test.com,
+    ///         "fullName": "Surname Name FatherName",
+    ///         "jobTitle": "Tester"
+    ///     }
+    /// </remarks>
     [HttpPost(Name = "RegisterUser")]
     [ProducesResponseType(StatusCodes.Status200OK,
         Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status409Conflict,
         Type = typeof(Dictionary<string, string[]>))]
-    public async Task<ActionResult> Register(RegistrationFormDto requestBody)
+    public async Task<ActionResult> Register([FromBody] RegistrationFormDto requestBody)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         var usernameIsTaken = await _userService.IsUsernameTaken(requestBody.Username);
         if (usernameIsTaken) ModelState.AddModelError("username",
             $"Имя пользователя {requestBody.Username} уже занято.");

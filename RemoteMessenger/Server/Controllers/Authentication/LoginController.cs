@@ -19,19 +19,30 @@ public class LoginController : ControllerBase
     }
 
     /// <summary>
-    /// Вход.
+    /// Вход
     /// </summary>
-    /// <param name="request">Тело запроса.</param>
+    /// <param name="request">Данные для логина.</param>
     /// <response code="200"> Пользователь успешно вошёл. Возращает JWT
     /// токен для дальнейшей аутентификации</response>
-    /// <response code="401"> Пользователь не смог войти. Возращаем ошибки. </response>
+    /// <response code="400"> Пользователь не смог войти. Возращаем ошибки. </response>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     POST /auth/login
+    ///     {
+    ///         "username": "@user",
+    ///         "password": "password"
+    ///     }
+    /// </remarks>
     [HttpPost(Name = "Login")]
     [ProducesResponseType(StatusCodes.Status200OK,
         Type = typeof(string))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized,
+    [ProducesResponseType(StatusCodes.Status400BadRequest,
         Type = typeof(Dictionary<string, string[]>))]
-    public async Task<IActionResult> Login(LoginUserFormDto request)
+    public async Task<IActionResult> Login([FromBody] LoginUserFormDto request)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         var user = await _userService.GetUserAsync(request.Username);
         if (user is null)
         {
@@ -43,7 +54,7 @@ public class LoginController : ControllerBase
         if (!await user!.IsPasswordValidAsync(request.Password))
             ModelState.AddModelError("password",
                 $"Неправильный пароль.");
-        if (!ModelState.IsValid) return Conflict();
+        if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var token = JwtTokenManager.IssueToken(user);
         _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.\n Token: {token}");

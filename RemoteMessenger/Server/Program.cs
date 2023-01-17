@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Hubs;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
-using RemoteMessenger.Server.Setup;
+using RemoteMessenger.Server.Startup;
 using RemoteMessenger.Server.Util;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,29 +15,11 @@ builder.Services.AddControllers(op =>
 {
     op.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
-// Initialize DataBase services
-var inMemory = builder.Configuration.GetValue<bool>("InMemory");
-if (inMemory) 
-{
-    builder.Services.AddDbContext<MessengerContext>(
-        optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb"),
-        contextLifetime: ServiceLifetime.Singleton,
-        optionsLifetime: ServiceLifetime.Singleton
-    );
-}
-else
-{
-    var connectionString = builder.Configuration["Database"] ?? "";
-    builder.Services.AddDbContext<MessengerContext>(
-        optionsAction: op => op.UseNpgsql(connectionString),
-        contextLifetime: ServiceLifetime.Singleton,
-        optionsLifetime: ServiceLifetime.Singleton
-    );
-}
+builder.UseDatabase();
 
 builder.Services.AddSingleton<UserService>();
 
@@ -60,18 +42,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorization();
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(op =>
-    {
-        op.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        op.RoutePrefix = string.Empty;
-    });
-}
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 
-namespace RemoteMessenger.Server.Setup;
+namespace RemoteMessenger.Server.Startup;
 
 public static class ConfigureSwagger
 {
@@ -43,5 +43,20 @@ public static class ConfigureSwagger
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
         return services;
+    }
+
+    public static WebApplication UseSwaggerUI(this WebApplication app)
+    {
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(op =>
+            {
+                op.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                op.RoutePrefix = string.Empty;
+            });
+        }
+        return app;
     }
 }
