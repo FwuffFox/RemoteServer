@@ -22,9 +22,9 @@ public sealed class User
             _username = value.ToLower();
         }
     }
-    
-    public string FullName { get; set; } = string.Empty;
 
+    public string Email { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
     
     private string _role = string.Empty;
@@ -34,20 +34,14 @@ public sealed class User
         get => _role;
         set => _role = value is Roles.Admin ? value : Roles.User;
     }
-    
-    private string _gender = string.Empty;
-    
-    public string Gender
-    {
-        get => _gender;
-        set
-        {
-            _gender = value is Genders.Male or Genders.Female ? value : "Undefined";
-        }
-    }
-    
-    public string DateOfBirth { get; set; } = string.Empty;
-    
+
+    [JsonIgnore]
+    public List<PublicMessage> PublicMessages { get; set; } = new ();
+
+    [JsonIgnore]
+    public List<PrivateChat> PrivateChats { get; set; } = new();
+
+
     [JsonIgnore] // Secret data
     public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
 

@@ -9,13 +9,13 @@ public class PrivateMessage
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
     
-    public required PrivateChat Chat { get; set; }
-    
     public required User Sender { get; set; }
     
-    public required User Receiver { get; set; }
-
     public required string Body { get; set; }
-
+    
     public required DateTime SendTime { get; set; }
+    
+    
+    public int PrivateChatId { get; set; }
+    public PrivateChat Chat { get; set; }
 }

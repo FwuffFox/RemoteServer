@@ -1,69 +1,25 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.OpenApi.Models;
 using RemoteMessenger.Server.Hubs;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
+using RemoteMessenger.Server.Startup;
 using RemoteMessenger.Server.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddControllers(op =>
 {
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT Authorization header using the Bearer scheme. </br> 
-                      Enter 'Bearer' [space] and then your token in the text input below. </br>
-                      Example: 'Bearer 12345abcdef'",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
-
-            },
-            new List<string>()
-        }
-    });
+    op.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
 });
 
-// Initialize DataBase services
-var inMemory = builder.Configuration.GetValue<bool>("InMemory");
-if (inMemory) 
-{
-    builder.Services.AddDbContext<MessengerContext>(
-        optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb")
-    );
-}
-else
-{
-    var connectionString = builder.Configuration["Database"] ?? "";
-    builder.Services.AddDbContext<MessengerContext>(
-        optionsAction: op => op.UseNpgsql(connectionString),
-        contextLifetime: ServiceLifetime.Singleton,
-        optionsLifetime: ServiceLifetime.Singleton
-    );
-}
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwagger();
+
+builder.UseDatabase();
 
 builder.Services.AddSingleton<UserService>();
 
@@ -86,14 +42,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorization();
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -113,11 +69,9 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)] () => "Authenticated as Admin");
 }
 
-app.MapPost("/add_register_code", 
-    [Authorize(Roles = Roles.Admin)] async (HttpContext context, UserService userService, RegistrationCodeDto code) =>
-    {
-        await userService.CreateRegistrationCodeAsync(new RegistrationCode {Code = code.Code, Role = code.Role});
-    });
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 app.MapHub<DirectMessagesHub>(DirectMessagesHub.HubUrl);
 app.Run();
+
+// WarmUp database
+var _ = app.Services.GetService<MessengerContext>()!.Users.FirstOrDefault();

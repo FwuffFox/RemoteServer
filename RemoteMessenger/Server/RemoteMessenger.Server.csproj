@@ -4,6 +4,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!--Disable documentation warnings.-->
+        <NoWarn>$(NoWarn);1591</NoWarn> 
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,10 +20,6 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Migrations" />
     </ItemGroup>
 
     <ItemGroup>

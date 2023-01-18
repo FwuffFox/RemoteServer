@@ -10,7 +10,3 @@ riderModule.iml
 *.db-wal
 .idea/
 .vs/
-
-# remove autogen css
-GeneralChat.razor.css
-ProfilePage.razor.css

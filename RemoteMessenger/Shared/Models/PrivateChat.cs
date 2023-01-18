@@ -8,15 +8,13 @@ public class PrivateChat
     [Key, Column(Order = 0)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
+     
+    public User[] Users { get; set; } = Array.Empty<User>();
     
-    public required User Sender { get; set; }
-    
-    public required User Receiver { get; set; }
+    public List<PrivateMessage> Messages = new();
 
     public async Task<bool> IsUserInChat(string username)
     {
-        return await Task.Run(() => Sender.Username == username || Receiver.Username == username);
+        return await Task.Run(() => Users.Any(user => user.Username == username));
     }
-
-    public List<PrivateMessage> Messages = new();
 }

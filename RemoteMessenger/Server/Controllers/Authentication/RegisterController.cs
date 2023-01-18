@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteMessenger.Server.Services;
-using RemoteMessenger.Shared.Models;
+using RemoteMessenger.Server.Util;
 
 namespace RemoteMessenger.Server.Controllers.Authentication;
 
 [ApiController]
-[Route("auth/register")]
+[Route("/auth/register")]
 public class RegisterController : ControllerBase
 {
     private readonly UserService _userService;
@@ -15,29 +15,56 @@ public class RegisterController : ControllerBase
         _userService = userService;
     }
 
+    /// <summary>
+    /// Регистрация
+    /// </summary>
+    /// <param name="requestBody">Данные для регистрации.</param>
+    /// <response code="200"> Пользователь успешно зарегистрирован. Возращает JWT
+    /// токен для дальнейшей аутентификации.</response>
+    /// <response code="400"> Пользователь не смог зарегистрироваться. Возращаем ошибки.</response>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     POST /auth/register
+    ///     {
+    ///         "username": "@user",
+    ///         "password": "password",
+    ///         "email": email@test.com,
+    ///         "fullName": "Surname Name FatherName",
+    ///         "jobTitle": "Tester"
+    ///     }
+    /// </remarks>
     [HttpPost(Name = "RegisterUser")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Register(RegistrationFormDto request)
+    [ProducesResponseType(StatusCodes.Status200OK,
+        Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status409Conflict,
+        Type = typeof(Dictionary<string, string[]>))]
+    public async Task<ActionResult> Register([FromBody] RegistrationFormDto requestBody)
     {
-        var usernameIsTaken = await _userService.IsUsernameTaken(request.Username);
-        if (usernameIsTaken) return BadRequest($"Username {request.Username} is taken");
+        if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var registerCode = await _userService.GetRegistrationCodeAsync(request.RegistrationCode);
-        if (registerCode is null) return BadRequest("Registration code doesn't exist");
-        
+        var usernameIsTaken = await _userService.IsUsernameTaken(requestBody.Username);
+        if (usernameIsTaken) ModelState.AddModelError("username",
+            $"Имя пользователя {requestBody.Username} уже занято.");
+
+        var emailIsTaken = await _userService.IsEmailTaken(requestBody.Email);
+        if (emailIsTaken) ModelState.AddModelError("email",
+            "Данная электронная почта уже занята.");
+
+        if (!ModelState.IsValid) return Conflict(ModelState);
+
         var user = new User
         {
-            Username = request.Username.ToLower(),
-            FullName = request.FullName,
-            JobTitle = request.JobTitle,
-            Role = registerCode.Role,
-            Gender = request.Gender,
-            DateOfBirth = request.DateOfBirth,
+            Username = requestBody.Username,
+            Email = requestBody.Email,
+            FullName = requestBody.FullName,
+            JobTitle = requestBody.JobTitle,
         };
-        await user.SetPassword(request.Password);
-        await _userService.CreateUserAsync(user, registerCode);
+        await user.SetPassword(requestBody.Password);
+        await _userService.CreateUserAsync(user);
+
+        var token = JwtTokenManager.IssueToken(user);
         
-        return Ok("User was registered");
+        return Ok(token);
     }
 }

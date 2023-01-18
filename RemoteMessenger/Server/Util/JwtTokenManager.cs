@@ -1,9 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RemoteMessenger.Server.Models;
-using RemoteMessenger.Shared.Models;
 
 namespace RemoteMessenger.Server.Util;
 
@@ -57,8 +54,6 @@ public static class JwtTokenManager
                 ClaimValueTypes.Integer64),
             new(JwtRegisteredClaimNames.UniqueName, user.Username),
             new(JwtRegisteredClaimNames.Name, user.FullName),
-            new(JwtRegisteredClaimNames.Gender, user.Gender),
-            new(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth),
             new("roles", user.Role)
         };
         var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);

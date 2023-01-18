@@ -6,7 +6,7 @@ namespace RemoteMessenger.Server.Hubs;
 [Authorize]
 public class DirectMessagesHub : Hub
 {
-    public const string HubUrl = "/private_chat";
+    public const string HubUrl = "/hubs/private_chat";
     private readonly MessengerContext _context;
     public DirectMessagesHub(MessengerContext context)
     {
@@ -18,7 +18,7 @@ public class DirectMessagesHub : Hub
         get => Context.User?.FindFirst(ClaimTypes.Name)?.Value!;
     }
     
-    public async Task Broadcast(string receiver, string message)
+    public async Task SendMessage(string message, string receiver)
     {
         var receiverUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == receiver);
         if (receiverUser is null) return;
