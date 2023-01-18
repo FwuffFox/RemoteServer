@@ -13,7 +13,7 @@ public class GeneralChatController : ControllerBase
     }
     
     [HttpGet("{amount:int}")]
-    public async Task<List<PublicMessage>> GetLastMessages(int amount)
+    public async Task<ActionResult< List<PublicMessage> >> GetLastMessages(int amount)
     {
         var result = await Task.Run(() =>
             _context.PublicMessages
