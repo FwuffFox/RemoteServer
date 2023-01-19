@@ -41,7 +41,8 @@ public class GeneralChatHub : Hub
                 .Include(m => m.Sender)
                 .OrderByDescending(x => x.Id)
                 .Take(100));
-        await Clients.Caller.SendAsync("OnConnect", lastMessages.Reverse());
+        var result = lastMessages.Reverse().ToList();
+        await Clients.Caller.SendCoreAsync("OnConnect", result.ToArray<Object>());
         await base.OnConnectedAsync();
     }
 
