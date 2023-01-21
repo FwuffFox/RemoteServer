@@ -6,7 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!--Disable documentation warnings.-->
-        <NoWarn>$(NoWarn);1591</NoWarn> 
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS> 
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +25,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shared\RemoteMessenger.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

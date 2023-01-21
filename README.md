@@ -20,11 +20,12 @@
     #### В первый запуск ####
     Установка EF Core
    ```shell
-    dotnet tool install --global dotnet-ef.
+    dotnet tool install --global dotnet-ef
     ```
    #### При каждом обновлении ####
    1. Миграция базы данных
    ```shell
+    cd RemoteMessenger/Server
     dotnet efcore migrations add <ИмяМиграцииЗдесь>
    ```
    2. Обновление базы данных

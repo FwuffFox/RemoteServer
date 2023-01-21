@@ -23,7 +23,7 @@ public static class ConfigureDatabase
 
     private static WebApplicationBuilder UseRemoteDatabase(this WebApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration["Database"] ?? "";
+        var connectionString = builder.Configuration.GetConnectionString("MessengerContext");
         
         builder.Services.AddDbContext<MessengerContext>(
             optionsAction: op => op.UseNpgsql(connectionString),
