@@ -49,7 +49,7 @@ public class LoginController : ControllerBase
             ModelState.AddModelError("username",
                 $"Пользователя {request.Username} не существует.");
         }
-        if (!ModelState.IsValid) return Unauthorized(ModelState);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
         
         if (!await user!.IsPasswordValidAsync(request.Password))
             ModelState.AddModelError("password",

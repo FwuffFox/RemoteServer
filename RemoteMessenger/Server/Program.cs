@@ -49,6 +49,14 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<MessengerContext>();
+    scope.ServiceProvider.GetRequiredService<ILogger>()
+        .LogInformation($"Database created {context.Database.EnsureCreated()}");
+}
+
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
@@ -71,7 +79,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 app.MapHub<DirectMessagesHub>(DirectMessagesHub.HubUrl);
+
 app.Run();
 
-// WarmUp database
-var _ = app.Services.GetService<MessengerContext>()!.Users.FirstOrDefault();
