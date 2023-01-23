@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.SignalR;
@@ -36,11 +35,7 @@ JwtTokenManager.Initialize(
 
 // RSAEncryption.Initialize();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = JwtTokenManager.TokenValidationParameters!;
-});
-builder.Services.AddAuthorization();
+builder.UseJwtAuthentication();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -53,8 +48,24 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<MessengerContext>();
-    scope.ServiceProvider.GetRequiredService<ILogger>()
+    app.Logger
         .LogInformation($"Database created {context.Database.EnsureCreated()}");
+    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+    if (!await userService.IsUsernameTaken("@admin"))
+    {
+        var user = new User()
+        {
+            Username = "@admin",
+            FullName = "Admin Adminovich",
+            JobTitle = "Admin"
+        };
+        var password = builder.Configuration.GetValue<string>("AdminPassword") ?? "";
+        await user.SetPassword(password);
+        await userService.CreateUserAsync(user);
+        app.Logger
+            .LogInformation($"Admin created {user.Username}: {password}");
+    }
+    
 }
 
 app.UseSwaggerUI();

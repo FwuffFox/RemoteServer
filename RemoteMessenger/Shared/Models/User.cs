@@ -13,7 +13,7 @@ public sealed class User
     
     private string _username = string.Empty;
 
-    public string Username
+    public required string Username
     {
         get => _username;
         set
@@ -23,9 +23,8 @@ public sealed class User
         }
     }
 
-    public string Email { get; set; } = string.Empty;
-    public string FullName { get; set; } = string.Empty;
-    public string JobTitle { get; set; } = string.Empty;
+    public required string FullName { get; set; } = string.Empty;
+    public required string JobTitle { get; set; } = string.Empty;
     
     private string _role = string.Empty;
     

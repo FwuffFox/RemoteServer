@@ -47,16 +47,11 @@ public class RegisterController : ControllerBase
         if (usernameIsTaken) ModelState.AddModelError("username",
             $"Имя пользователя {requestBody.Username} уже занято.");
 
-        var emailIsTaken = await _userService.IsEmailTaken(requestBody.Email);
-        if (emailIsTaken) ModelState.AddModelError("email",
-            "Данная электронная почта уже занята.");
-
         if (!ModelState.IsValid) return Conflict(ModelState);
 
         var user = new User
         {
             Username = requestBody.Username,
-            Email = requestBody.Email,
             FullName = requestBody.FullName,
             JobTitle = requestBody.JobTitle,
         };

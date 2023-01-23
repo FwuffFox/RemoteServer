@@ -4,20 +4,9 @@ public static class ConfigureDatabase
 {
     public static WebApplicationBuilder UseDatabase(this WebApplicationBuilder builder)
     {
-        var inMemory = builder.Configuration.GetValue<bool>("InMemory");
-        if (inMemory) builder.UseInMemoryDatabase();
+        var useSqlite = builder.Configuration.GetValue<bool>("UseSqlite");
+        if (useSqlite) builder.UseSQLiteDatabase();
         else builder.UseRemoteDatabase();
-        return builder;
-    }
-
-    private static WebApplicationBuilder UseInMemoryDatabase(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddDbContext<MessengerContext>(
-            optionsAction: op => op.UseInMemoryDatabase(databaseName: "MessengerDb"),
-            contextLifetime: ServiceLifetime.Singleton,
-            optionsLifetime: ServiceLifetime.Singleton
-        );
-        
         return builder;
     }
 
@@ -31,6 +20,17 @@ public static class ConfigureDatabase
             optionsLifetime: ServiceLifetime.Singleton
         );
 
+        return builder;
+    }
+
+    private static WebApplicationBuilder UseSQLiteDatabase(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddDbContext<MessengerContext>(
+            optionsAction: op => op.UseSqlite("Data Source=database.db"),
+            contextLifetime: ServiceLifetime.Singleton,
+            optionsLifetime: ServiceLifetime.Singleton
+        );
+        
         return builder;
     }
 }

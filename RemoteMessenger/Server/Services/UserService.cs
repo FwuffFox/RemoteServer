@@ -31,9 +31,6 @@ public class UserService
     public async Task<bool> IsUsernameTaken(string username)
         => await _context.Users.AnyAsync(user => user.Username == username);
 
-    public async Task<bool> IsEmailTaken(string email)
-        => await _context.Users.AnyAsync(user => user.Email == email);
-
     public async Task CreateUserAsync(User user)
     {
         await _context.Users.AddAsync(user);
