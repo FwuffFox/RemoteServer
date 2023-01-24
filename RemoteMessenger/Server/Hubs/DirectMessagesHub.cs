@@ -23,6 +23,6 @@ public class DirectMessagesHub : Hub
         var receiverUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == receiver);
         if (receiverUser is null) return;
         await Clients.All.SendAsync("Broadcast", IdentityName, message);
-        //await Clients.User(IdentityName).SendAsync("ReceiveMessage",IdentityName, message);
+        // Clients.User(IdentityName).SendAsync("ReceiveMessage",IdentityName, message);
     }
 }

@@ -1,9 +1,9 @@
-namespace RemoteMessenger.Server.Services;
+namespace RemoteMessenger.Server.Repositories;
 
-public class UserService 
+public class UserRepository 
 {
     private readonly MessengerContext _context;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<UserRepository> _logger;
 
     public MessengerContext Context 
     {
@@ -11,7 +11,7 @@ public class UserService
         private set => value = _context;
     }
 
-    public UserService(MessengerContext context, ILogger<UserService> logger)
+    public UserRepository(MessengerContext context, ILogger<UserRepository> logger)
     {
         _context = context;
         _logger = logger;

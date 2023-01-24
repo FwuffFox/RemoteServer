@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
 
@@ -8,11 +9,13 @@ namespace RemoteMessenger.Server.Controllers.Authentication;
 [Route("/auth/register")]
 public class RegisterController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly UserRepository _userRepository;
+    private readonly JwtTokenManager _jwtTokenManager;
 
-    public RegisterController(UserService userService)
+    public RegisterController(UserRepository userRepository, JwtTokenManager jwtTokenManager)
     {
-        _userService = userService;
+        _userRepository = userRepository;
+        _jwtTokenManager = jwtTokenManager;
     }
 
     /// <summary>
@@ -43,7 +46,7 @@ public class RegisterController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var usernameIsTaken = await _userService.IsUsernameTaken(requestBody.Username);
+        var usernameIsTaken = await _userRepository.IsUsernameTaken(requestBody.Username);
         if (usernameIsTaken) ModelState.AddModelError("username",
             $"Имя пользователя {requestBody.Username} уже занято.");
 
@@ -56,9 +59,9 @@ public class RegisterController : ControllerBase
             JobTitle = requestBody.JobTitle,
         };
         await user.SetPassword(requestBody.Password);
-        await _userService.CreateUserAsync(user);
+        await _userRepository.CreateUserAsync(user);
 
-        var token = JwtTokenManager.IssueToken(user);
+        var token = _jwtTokenManager.IssueToken(user);
         
         return Ok(token);
     }

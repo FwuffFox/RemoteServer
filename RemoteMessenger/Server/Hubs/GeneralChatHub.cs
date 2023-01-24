@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
 
 namespace RemoteMessenger.Server.Hubs;
@@ -9,18 +10,18 @@ public class GeneralChatHub : Hub
 {
     public const string HubUrl = "/hubs/general_chat";
     private readonly ILogger<GeneralChatHub> _logger;
-    private readonly UserService _userService;
+    private readonly UserRepository _userRepository;
     private readonly MessengerContext _context;
-    public GeneralChatHub(ILogger<GeneralChatHub> logger, UserService userService, MessengerContext context)
+    public GeneralChatHub(ILogger<GeneralChatHub> logger, UserRepository userRepository, MessengerContext context)
     {
         _logger = logger;
-        _userService = userService;
+        _userRepository = userRepository;
         _context = context;
     }
 
     public async Task SendMessage(string message, string username)
     {
-        var user = await _userService.GetUserAsync(username);
+        var user = await _userRepository.GetUserAsync(username);
         if (user is null) return; 
         var sentMessage = new PublicMessage
         {

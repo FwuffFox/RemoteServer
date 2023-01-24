@@ -13,7 +13,8 @@ public static class ConfigureAuthentication
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = JwtTokenManager.TokenValidationParameters!;
+            options.TokenValidationParameters =
+                builder.Configuration.CreateTokenValidationParameters();
         
             options.Events = new JwtBearerEvents
             {

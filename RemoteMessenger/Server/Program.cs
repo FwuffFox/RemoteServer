@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Hubs;
+using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
 using RemoteMessenger.Server.Startup;
@@ -14,26 +15,16 @@ builder.Services.AddControllers(op =>
 {
     op.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
 });
-
+builder.Services.AddSingleton<JwtTokenManager>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
-builder.UseDatabase();
 
-builder.Services.AddSingleton<UserService>();
+builder.UseDatabase();
+builder.Services.AddSingleton<UserRepository>();
 
 builder.Services.AddSingleton<IUserIdProvider, JwtUniqueNameBasedProvider>();
 builder.Services.AddSignalR();
-
-// Initialize JwtTokenManager
-JwtTokenManager.Initialize(
-    secret: builder.Configuration["Jwt:Secret"],
-    expireDays: builder.Configuration.GetValue<int>("Jwt:ExpireDays"),
-    issuer: builder.Configuration["Jwt:Issuer"],
-    audience: builder.Configuration["Jwt:Audience"]
-    );
-
-// RSAEncryption.Initialize();
 
 builder.UseJwtAuthentication();
 
@@ -50,7 +41,7 @@ if (app.Environment.IsDevelopment())
     var context = scope.ServiceProvider.GetRequiredService<MessengerContext>();
     app.Logger
         .LogInformation($"Database created {context.Database.EnsureCreated()}");
-    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+    var userService = scope.ServiceProvider.GetRequiredService<UserRepository>();
     if (!await userService.IsUsernameTaken("@admin"))
     {
         var user = new User()
@@ -76,9 +67,9 @@ app.UseAuthorization();
 app.MapControllers();
     
 app.MapGet("/validate_jwt",
-    async ([FromQuery] string jwt) =>
+    async ([FromQuery] string jwt, JwtTokenManager jwtTokenManager) =>
     {
-        var res = await JwtTokenManager.ValidateToken(jwt);
+        var res = await jwtTokenManager.ValidateToken(jwt);
         return res.IsValid;
     });
 
