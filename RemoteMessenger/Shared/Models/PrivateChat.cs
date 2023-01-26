@@ -13,8 +13,13 @@ public class PrivateChat
     
     public List<PrivateMessage> Messages = new();
 
-    public async Task<bool> IsUserInChat(string username)
+    public async Task<bool> IsUserInChatAsync(string username)
     {
         return await Task.Run(() => Users.Any(user => user.Username == username));
+    }
+
+    public bool IsUserInChat(string username)
+    {
+        return Users.Any(user => user.Username == username);
     }
 }
