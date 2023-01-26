@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Hubs;
+using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Services.SignalR;
 using RemoteMessenger.Server.Startup;
@@ -15,32 +15,18 @@ builder.Services.AddControllers(op =>
 {
     op.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
 });
-
+builder.Services.AddSingleton<JwtTokenManager>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
-builder.UseDatabase();
 
-builder.Services.AddSingleton<UserService>();
+builder.UseDatabase();
+builder.Services.AddSingleton<UserRepository>();
 
 builder.Services.AddSingleton<IUserIdProvider, JwtUniqueNameBasedProvider>();
 builder.Services.AddSignalR();
 
-// Initialize JwtTokenManager
-JwtTokenManager.Initialize(
-    secret: builder.Configuration["Jwt:Secret"],
-    expireDays: builder.Configuration.GetValue<int>("Jwt:ExpireDays"),
-    issuer: builder.Configuration["Jwt:Issuer"],
-    audience: builder.Configuration["Jwt:Audience"]
-    );
-
-// RSAEncryption.Initialize();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = JwtTokenManager.TokenValidationParameters!;
-});
-builder.Services.AddAuthorization();
+builder.UseJwtAuthentication();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -53,8 +39,24 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<MessengerContext>();
-    scope.ServiceProvider.GetRequiredService<ILogger>()
+    app.Logger
         .LogInformation($"Database created {context.Database.EnsureCreated()}");
+    var userService = scope.ServiceProvider.GetRequiredService<UserRepository>();
+    if (!await userService.IsUsernameTaken("@admin"))
+    {
+        var user = new User()
+        {
+            Username = "@admin",
+            FullName = "Admin Adminovich",
+            JobTitle = "Admin"
+        };
+        var password = builder.Configuration.GetValue<string>("AdminPassword") ?? "";
+        await user.SetPassword(password);
+        await userService.CreateUserAsync(user);
+        app.Logger
+            .LogInformation($"Admin created {user.Username}: {password}");
+    }
+    
 }
 
 app.UseSwaggerUI();
@@ -65,9 +67,9 @@ app.UseAuthorization();
 app.MapControllers();
     
 app.MapGet("/validate_jwt",
-    async ([FromQuery] string jwt) =>
+    async ([FromQuery] string jwt, JwtTokenManager jwtTokenManager) =>
     {
-        var res = await JwtTokenManager.ValidateToken(jwt);
+        var res = await jwtTokenManager.ValidateToken(jwt);
         return res.IsValid;
     });
 

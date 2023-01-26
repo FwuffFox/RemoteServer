@@ -1,8 +1,8 @@
-name: remote_messenger_server
+name: remote-backend
 services: 
   remote_server:
-    image: remote_server
-    container_name: remote_messenger
+    image: littlefoxyuwu/remote-server:latest
+    container_name: remote-server
     ports:
       - "5101:80"
       - "5001:443"
@@ -15,12 +15,12 @@ services:
     depends_on:
       - db
     volumes:
-      - ${HOME}/.aspnet/https:/https/
+      - ~/.aspnet/https:/https/
     
   db:
     image: postgres
     restart: always
-    container_name: postgres_db
+    container_name: postgres
     environment: 
       POSTGRES_PASSWORD: "MyPassword"
       POSTGRES_USERNAME: "postgres"
@@ -31,6 +31,7 @@ services:
   
   adminer:
     image: adminer
+    container_name: adminer
     restart: always
     ports:
       - "8080:8080"

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
 
@@ -8,14 +9,15 @@ namespace RemoteMessenger.Server.Controllers.Authentication;
 [Route("/auth/login")]
 public class LoginController : ControllerBase
 {
+    private readonly JwtTokenManager _jwtTokenManager;
     private readonly ILogger<LoginController> _logger;
+    private readonly UserRepository _userRepository;
 
-    private readonly UserService _userService;
-
-    public LoginController(ILogger<LoginController> logger, UserService userService)
+    public LoginController(ILogger<LoginController> logger, UserRepository userRepository, JwtTokenManager jwtTokenManager)
     {
         _logger = logger;
-        _userService = userService;
+        _userRepository = userRepository;
+        _jwtTokenManager = jwtTokenManager;
     }
 
     /// <summary>
@@ -43,7 +45,7 @@ public class LoginController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var user = await _userService.GetUserAsync(request.Username);
+        var user = await _userRepository.GetUserAsync(request.Username);
         if (user is null)
         {
             ModelState.AddModelError("username",
@@ -56,7 +58,7 @@ public class LoginController : ControllerBase
                 $"Неправильный пароль.");
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var token = JwtTokenManager.IssueToken(user);
+        var token = _jwtTokenManager.IssueToken(user);
         _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.\n Token: {token}");
         return Ok(token);
     }

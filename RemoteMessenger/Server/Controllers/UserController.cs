@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RemoteMessenger.Server.Services;
 using RemoteMessenger.Server.Util;
 
 namespace RemoteMessenger.Server.Controllers;
@@ -8,11 +7,11 @@ namespace RemoteMessenger.Server.Controllers;
 [Authorize]
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly UserRepository _userRepository;
     
-    public UserController(UserService userService)
+    public UserController(UserRepository userRepository)
     {
-        _userService = userService;
+        _userRepository = userRepository;
     }
 
     [HttpGet(Name = "Get User")]
@@ -28,8 +27,8 @@ public class UserController : ControllerBase
         }
         
         var user = id is not null ? 
-            await _userService.GetUserAsync(id.Value) : 
-            await _userService.GetUserAsync(username!);
+            await _userRepository.GetUserAsync(id.Value) : 
+            await _userRepository.GetUserAsync(username!);
         
         if (user is null) return NotFound("No such user");
         return Ok(user);
@@ -39,6 +38,6 @@ public class UserController : ControllerBase
     [HttpGet("get_all_users")]
     public async Task<IActionResult> GetUsers()
     {
-        return Ok(await _userService.GetAllUsersAsync());
+        return Ok(await _userRepository.GetAllUsersAsync());
     }
 }
