@@ -21,7 +21,14 @@ public class DirectMessagesHub : Hub
     {
         get => Context.User?.FindFirst(ClaimTypes.Name)?.Value!;
     }
-    
+
+    public override async Task OnConnectedAsync()
+    {
+        var chats = _privateChatRepository.GetUserPrivateChats(IdentityName);
+        
+        await base.OnConnectedAsync();
+    }
+
     public async Task SendMessage(string message, string receiver)
     {
         var receiverUser = await _userRepository.GetUserAsync(receiver);

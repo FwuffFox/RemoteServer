@@ -15,6 +15,11 @@ public class PrivateChatRepository
             chat.IsUserInChat(firstUsername) && chat.IsUserInChat(secondUsername));
     }
 
+    public IEnumerable<PrivateChat> GetUserPrivateChats(string username)
+    {
+        return _context.PrivateChats.Where(chat => chat.IsUserInChat(username));
+    }
+
     public async Task CreateNewPrivateChat(PrivateChat chat)
     {
         await _context.PrivateChats.AddAsync(chat);
