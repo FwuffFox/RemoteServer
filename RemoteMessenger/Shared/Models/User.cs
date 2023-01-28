@@ -56,7 +56,7 @@ public sealed class User
     }
 
     /// <summary>
-    /// Creates a new Salt and Hash for <c>User</c>.
+    /// Creates a new Salt and Hash for <see cref="User"/>.
     /// </summary>
     public async Task SetPassword(string newPassword)
     {

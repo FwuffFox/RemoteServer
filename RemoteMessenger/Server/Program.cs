@@ -77,6 +77,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapGet("/auth/check_auth", [Authorize] () => "Authenticated");
     app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)] () => "Authenticated as Admin");
+    app.MapGet("/test/get_user_private_chats",
+        (HttpContext context, PrivateChatRepository rep)
+            => rep.GetUserPrivateChats(context.User.GetUniqueName()));
 }
 
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);

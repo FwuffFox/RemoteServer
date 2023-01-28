@@ -11,13 +11,19 @@ public class PrivateChatRepository
 
     public async Task<PrivateChat?> GetPrivateChat(string firstUsername, string secondUsername)
     {
-        return await _context.PrivateChats.FirstOrDefaultAsync(chat =>
+        return await _context.PrivateChats
+            .Include(x => x.Users)
+            .Include(x => x.Messages)
+            .FirstOrDefaultAsync(chat =>
             chat.IsUserInChat(firstUsername) && chat.IsUserInChat(secondUsername));
     }
 
-    public IEnumerable<PrivateChat> GetUserPrivateChats(string username)
+    public IQueryable<PrivateChat> GetUserPrivateChats(string username)
     {
-        return _context.PrivateChats.Where(chat => chat.IsUserInChat(username));
+        return _context.PrivateChats
+            .Include(x => x.Users)
+            .Include(x => x.Messages)
+            .Where(chat => chat.IsUserInChat(username));
     }
 
     public async Task CreateNewPrivateChat(PrivateChat chat)

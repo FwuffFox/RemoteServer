@@ -24,8 +24,8 @@ public class DirectMessagesHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var chats = _privateChatRepository.GetUserPrivateChats(IdentityName);
-        
+        var chats = await _privateChatRepository.GetUserPrivateChats(IdentityName).ToListAsync();
+        await Clients.Caller.SendAsync("OnConnect", chats);
         await base.OnConnectedAsync();
     }
 
@@ -48,7 +48,6 @@ public class DirectMessagesHub : Hub
         var privateMessage = new PrivateMessage
         {
             Body = message,
-            Chat = chat,
             Sender = senderUser,
             SendTime = DateTime.UtcNow,
         };

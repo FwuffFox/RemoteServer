@@ -14,6 +14,4 @@ public class PrivateMessage
     public required string Body { get; set; }
     
     public required DateTime SendTime { get; set; }
-    
-    public PrivateChat Chat { get; set; }
 }
