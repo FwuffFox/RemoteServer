@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.SignalR;
 using RemoteMessenger.Server.Repositories;
 using RemoteMessenger.Server.Services;
+using RemoteMessenger.Server.Util;
 
 namespace RemoteMessenger.Server.Hubs;
 
@@ -36,9 +37,9 @@ public class GeneralChatHub : Hub
         await base.OnConnectedAsync();
     }
     
-    public async Task SendMessage(string message, string username)
+    public async Task SendMessage(string message)
     {
-        var user = await _userRepository.GetUserAsync(username);
+        var user = await _userRepository.GetUserAsync(await Context.User?.GetUniqueNameAsync()!);
         if (user is null) return; 
         var sentMessage = new PublicMessage
         {

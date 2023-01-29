@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+using RemoteMessenger.Server.Util;
 
 namespace RemoteMessenger.Server.Hubs;
 
@@ -19,7 +20,7 @@ public class DirectMessagesHub : Hub
     
     private string IdentityName
     {
-        get => Context.User?.FindFirst(ClaimTypes.Name)?.Value!;
+        get => Context.User?.GetUniqueName()!;
     }
 
     public override async Task OnConnectedAsync()

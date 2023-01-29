@@ -7,7 +7,9 @@ public static class Extensions
 {
     public static string GetUniqueName(this ClaimsPrincipal user)
     {
-        return user.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value!;
+        var res = user.FindFirstValue(JwtRegisteredClaimNames.UniqueName);
+        res ??= user.FindFirstValue(ClaimTypes.Name);
+        return res!;
     }
     
     public static async Task<string> GetUniqueNameAsync(this ClaimsPrincipal user)
