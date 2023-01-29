@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace RemoteMessenger.Server.Hubs;
 
-[Authorize]
+// [Authorize]
 public class DirectMessagesHub : Hub
 {
     public const string HubUrl = "/hubs/private_chat";
