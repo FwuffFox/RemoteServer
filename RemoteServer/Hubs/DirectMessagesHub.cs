@@ -61,10 +61,11 @@ public class DirectMessagesHub : Hub
             .SendAsync("OnNewMessage", privateMessage);
     }
 
-    public async Task GetMessages(string chatName)
+    public async Task<List<PrivateMessage>?> GetMessages(string chatName)
     {
         var targetChat = await _privateChatRepository.GetPrivateChatAsync(chatName, IdentityName);
-        if (targetChat is null) return;
+        if (targetChat is null) return null;
         await Clients.Caller.SendAsync("GetMessages", targetChat.Messages);
+        return targetChat.Messages;
     }
 }
