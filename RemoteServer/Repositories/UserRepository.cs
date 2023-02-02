@@ -24,7 +24,7 @@ public class UserRepository
         => await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
     
     public async Task<User?> GetUserAsync(int id)
-        => await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
+        => await _context.Users.FirstOrDefaultAsync(user => user.UserId == id);
 
     public async Task<IQueryable<User>> GetAllUsersAsync()
     {

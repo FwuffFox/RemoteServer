@@ -60,7 +60,7 @@ public class LoginController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var token = _jwtTokenManager.IssueToken(user);
-        _logger.LogInformation($"{user.Username} with id {user.Id} have logged in.\n Token: {token}");
+        _logger.LogInformation($"{user.Username} with id {user.UserId} have logged in.\n Token: {token}");
         return Ok(token);
     }
 }

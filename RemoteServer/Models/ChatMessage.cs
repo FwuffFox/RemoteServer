@@ -3,15 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RemoteServer.Models;
 
-public class PrivateMessage
+public class ChatMessage
 {
     [Key, Column(Order = 0)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+    public long ChatMessageId { get; set; }
     
-    public required User Sender { get; set; }
-    
+    public int FromUserId { get; set; }
+
+    public int ToUserId { get; set; }
+
     public required string Body { get; set; }
     
-    public required DateTime SendTime { get; set; }
+    public required DateTime SentOn { get; set; }
 }

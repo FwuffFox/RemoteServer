@@ -9,7 +9,7 @@ namespace RemoteServer.Models;
 public sealed class User
 {
     [Key, Column(Order = 0)]
-    public int Id { get; init; }
+    public int UserId { get; init; }
     
     private string _username = string.Empty;
 
@@ -36,10 +36,7 @@ public sealed class User
 
     [JsonIgnore]
     public List<PublicMessage> PublicMessages { get; set; } = new ();
-
-    [JsonIgnore]
-    public List<PrivateChat> PrivateChats { get; set; } = new();
-
+    
 
     [JsonIgnore] // Secret data
     public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
