@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RemoteServer.Models;
 
@@ -9,9 +10,11 @@ public class ChatMessage
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long ChatMessageId { get; set; }
     
-    public int FromUserId { get; set; }
+    [JsonIgnore]
+    public required User FromUser { get; set; }
 
-    public int ToUserId { get; set; }
+    [JsonIgnore]
+    public required User ToUser { get; set; }
 
     public required string Body { get; set; }
     

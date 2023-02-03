@@ -28,16 +28,48 @@ public class ChatHub : Hub
 
     public override async Task OnConnectedAsync()
     {
+        var me = await _userRepository.GetUserAsync(IdentityName);
+        var myChatInfos = await _chatMessagesRepository.GetAllUserChats(me!);
+        await Clients.Caller.SendAsync("OnConnected", myChatInfos);
         await base.OnConnectedAsync();
     }
 
-    public async Task SendMessage(string message, string receiver)
+    private struct MessageWithSender
     {
+        public User Sender { get; set; }
+        public ChatMessage Message { get; set; }
+    }
+    
+    public async Task SendMessage(string message, string receiverName)
+    {
+        var me = await _userRepository.GetUserAsync(IdentityName);
+        var receiver = await _userRepository.GetUserAsync(receiverName);
+        if (me is null || receiver is null) return;
         
+        var chatMessage = new ChatMessage
+        {
+            FromUser = me,
+            ToUser = receiver,
+            Body = message,
+            SentOn = DateTime.Now
+        };
+        await _chatMessagesRepository.SaveChatMessageAsync(chatMessage);
+
+        var messageWithSender = new MessageWithSender
+        {
+            Sender = me,
+            Message = chatMessage
+        };
+        
+        await Clients.User(receiverName).SendAsync("OnGetMessage", messageWithSender);
     }
 
-    public async Task<List<ChatMessage>?> GetMessages(string chatName)
+    public async Task<ChatInfo?> GetChatInfo(string otherUserName)
     {
-        return null;
+        var me = await _userRepository.GetUserAsync(IdentityName);
+        var otherUser = await _userRepository.GetUserAsync(otherUserName);
+        if (me is null || otherUser is null) return null;
+        var chatInfo = await _chatMessagesRepository.GetChatInfoAsync(me, otherUser);
+        return chatInfo;
     }
 }
