@@ -24,6 +24,7 @@ builder.Services.AddSwagger();
 
 builder.UseDatabase();
 builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddSingleton<ChatMessagesRepository>();
 
 builder.Services.AddSingleton<IUserIdProvider, JwtUniqueNameBasedProvider>();
 builder.Services.AddSignalR();
