@@ -53,14 +53,11 @@ public class ChatMessagesRepository
 
     public IQueryable<User> GetAllUserContacts(User me)
     {
-        var myMessages = _context.ChatMessages
-            .Where(msg => msg.FromUser == me || msg.ToUser == me);
-
-        return myMessages
+        return _context.ChatMessages
+            .Where(msg => msg.FromUser == me || msg.ToUser == me)
             .OrderByDescending(message => message.SentOn)
             .Select(msg => msg.FromUser != me ? msg.FromUser : msg.ToUser)
-            .DistinctBy(user => user.Username);
-
+            .Distinct();
     }
 
     public async Task<List<ChatInfo>> GetAllUserChats(User me)

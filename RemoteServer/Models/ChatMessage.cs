@@ -11,10 +11,10 @@ public class ChatMessage
     public long ChatMessageId { get; set; }
     
     [JsonIgnore]
-    public required User FromUser { get; set; }
+    public User? FromUser { get; set; }
 
     [JsonIgnore]
-    public required User ToUser { get; set; }
+    public User? ToUser { get; set; }
 
     public required string Body { get; set; }
     
