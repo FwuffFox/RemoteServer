@@ -1,4 +1,3 @@
-using RemoteServer.Models;
 using RemoteServer.Models.DbContexts;
 
 namespace RemoteServer.Startup;
@@ -16,11 +15,11 @@ public static class ConfigureDatabase
     private static WebApplicationBuilder UseRemoteDatabase(this WebApplicationBuilder builder)
     {
         var connectionString = builder.Configuration.GetConnectionString("MessengerContext");
-        
+
         builder.Services.AddDbContext<MessengerContext>(
-            optionsAction: op => op.UseNpgsql(connectionString),
-            contextLifetime: ServiceLifetime.Singleton,
-            optionsLifetime: ServiceLifetime.Singleton
+            op => op.UseNpgsql(connectionString),
+            ServiceLifetime.Singleton,
+            ServiceLifetime.Singleton
         );
 
         return builder;
@@ -29,11 +28,11 @@ public static class ConfigureDatabase
     private static WebApplicationBuilder UseSQLiteDatabase(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<MessengerContext>(
-            optionsAction: op => op.UseSqlite("Data Source=database.db"),
-            contextLifetime: ServiceLifetime.Singleton,
-            optionsLifetime: ServiceLifetime.Singleton
+            op => op.UseSqlite("Data Source=database.db"),
+            ServiceLifetime.Singleton,
+            ServiceLifetime.Singleton
         );
-        
+
         return builder;
     }
 }

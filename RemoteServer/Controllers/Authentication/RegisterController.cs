@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteServer.Models.Shared;
-using RemoteServer.Util;
-using RemoteServer.Repositories;
 using RemoteServer.Services;
 
 namespace RemoteServer.Controllers.Authentication;
@@ -10,8 +8,8 @@ namespace RemoteServer.Controllers.Authentication;
 [Route("/auth/register")]
 public class RegisterController : ControllerBase
 {
-    private readonly UserRepository _userRepository;
     private readonly JwtTokenManager _jwtTokenManager;
+    private readonly UserRepository _userRepository;
 
     public RegisterController(UserRepository userRepository, JwtTokenManager jwtTokenManager)
     {
@@ -20,22 +18,23 @@ public class RegisterController : ControllerBase
     }
 
     /// <summary>
-    /// Регистрация
+    ///     Регистрация
     /// </summary>
     /// <param name="requestBody">Данные для регистрации.</param>
-    /// <response code="200"> Пользователь успешно зарегистрирован. Возращает JWT
-    /// токен для дальнейшей аутентификации.</response>
+    /// <response code="200">
+    ///     Пользователь успешно зарегистрирован. Возращает JWT
+    ///     токен для дальнейшей аутентификации.
+    /// </response>
     /// <response code="400"> Пользователь не смог зарегистрироваться. Возращаем ошибки.</response>
     /// <remarks>
-    /// Пример запроса:
-    ///
+    ///     Пример запроса:
     ///     POST /auth/register
     ///     {
-    ///         "username": "@user",
-    ///         "password": "password",
-    ///         "email": email@test.com,
-    ///         "fullName": "Surname Name FatherName",
-    ///         "jobTitle": "Tester"
+    ///     "username": "@user",
+    ///     "password": "password",
+    ///     "email": email@test.com,
+    ///     "fullName": "Surname Name FatherName",
+    ///     "jobTitle": "Tester"
     ///     }
     /// </remarks>
     [HttpPost(Name = "RegisterUser")]
@@ -46,10 +45,11 @@ public class RegisterController : ControllerBase
     public async Task<ActionResult> Register([FromBody] RegistrationFormDto requestBody)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
+
         var usernameIsTaken = await _userRepository.IsUsernameTaken(requestBody.Username);
-        if (usernameIsTaken) ModelState.AddModelError("username",
-            $"Имя пользователя {requestBody.Username} уже занято.");
+        if (usernameIsTaken)
+            ModelState.AddModelError("username",
+                $"Имя пользователя {requestBody.Username} уже занято.");
 
         if (!ModelState.IsValid) return Conflict(ModelState);
 
@@ -57,13 +57,13 @@ public class RegisterController : ControllerBase
         {
             Username = requestBody.Username,
             FullName = requestBody.FullName,
-            JobTitle = requestBody.JobTitle,
+            JobTitle = requestBody.JobTitle
         };
         await user.SetPassword(requestBody.Password);
         await _userRepository.CreateUserAsync(user);
 
         var token = _jwtTokenManager.IssueToken(user);
-        
+
         return Ok(token);
     }
 }

@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.SignalR;
 using RemoteServer.Hubs;
 using RemoteServer.Models.DbContexts;
 using RemoteServer.Models.Shared;
-using RemoteServer.Repositories;
 using RemoteServer.Services;
 using RemoteServer.Services.SignalR;
 using RemoteServer.Startup;
-using RemoteServer.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,10 +29,7 @@ builder.Services.AddSignalR();
 
 builder.UseJwtAuthentication();
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
+builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 var app = builder.Build();
 
@@ -47,7 +42,7 @@ if (app.Environment.IsDevelopment())
     var userService = scope.ServiceProvider.GetRequiredService<UserRepository>();
     if (!await userService.IsUsernameTaken("@admin"))
     {
-        var user = new User()
+        var user = new User
         {
             Username = "@admin",
             FullName = "Admin Adminovich",
@@ -59,7 +54,6 @@ if (app.Environment.IsDevelopment())
         app.Logger
             .LogInformation($"Admin created {user.Username}: {password}");
     }
-    
 }
 
 app.UseSwaggerUI();
@@ -68,7 +62,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-    
+
 app.MapGet("/validate_jwt",
     async ([FromQuery] string jwt, JwtTokenManager jwtTokenManager) =>
     {
@@ -78,12 +72,11 @@ app.MapGet("/validate_jwt",
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapGet("/auth/check_auth", [Authorize] () => "Authenticated");
-    app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)] () => "Authenticated as Admin");
+    app.MapGet("/auth/check_auth", [Authorize]() => "Authenticated");
+    app.MapGet("/auth/admin/check_auth", [Authorize(Roles = Roles.Admin)]() => "Authenticated as Admin");
 }
 
 app.MapHub<GeneralChatHub>(GeneralChatHub.HubUrl);
 app.MapHub<ChatHub>(ChatHub.HubUrl);
 
 app.Run();
-

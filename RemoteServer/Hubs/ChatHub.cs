@@ -1,9 +1,6 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
-using RemoteServer.Util;
-using RemoteServer.Models;
 using RemoteServer.Models.DbContexts;
-using RemoteServer.Repositories;
+using RemoteServer.Util;
 
 namespace RemoteServer.Hubs;
 
@@ -11,20 +8,19 @@ namespace RemoteServer.Hubs;
 public class ChatHub : Hub
 {
     public const string HubUrl = "/hubs/private_chat";
+    private readonly ChatMessagesRepository _chatMessagesRepository;
     private readonly MessengerContext _context;
     private readonly UserRepository _userRepository;
-    private readonly ChatMessagesRepository _chatMessagesRepository;
-    public ChatHub(MessengerContext context, UserRepository userRepository, ChatMessagesRepository chatMessagesRepository)
+
+    public ChatHub(MessengerContext context, UserRepository userRepository,
+        ChatMessagesRepository chatMessagesRepository)
     {
         _context = context;
         _userRepository = userRepository;
         _chatMessagesRepository = chatMessagesRepository;
     }
-    
-    private string IdentityName
-    {
-        get => Context.User?.GetUniqueName()!;
-    }
+
+    private string IdentityName => Context.User?.GetUniqueName()!;
 
     public override async Task OnConnectedAsync()
     {
@@ -34,18 +30,12 @@ public class ChatHub : Hub
         await base.OnConnectedAsync();
     }
 
-    private struct MessageWithSender
-    {
-        public User Sender { get; set; }
-        public ChatMessage Message { get; set; }
-    }
-    
     public async Task SendMessage(string message, string receiverName)
     {
         var me = await _userRepository.GetUserAsync(IdentityName);
         var receiver = await _userRepository.GetUserAsync(receiverName);
         if (me is null || receiver is null) return;
-        
+
         var chatMessage = new ChatMessage
         {
             FromUser = me,
@@ -60,7 +50,7 @@ public class ChatHub : Hub
             Sender = me,
             Message = chatMessage
         };
-        
+
         await Clients.User(receiverName).SendAsync("OnGetMessage", messageWithSender);
     }
 
@@ -71,5 +61,11 @@ public class ChatHub : Hub
         if (me is null || otherUser is null) return null;
         var chatInfo = await _chatMessagesRepository.GetChatInfoAsync(me, otherUser);
         return chatInfo;
+    }
+
+    private struct MessageWithSender
+    {
+        public User Sender { get; set; }
+        public ChatMessage Message { get; set; }
     }
 }

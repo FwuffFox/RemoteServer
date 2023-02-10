@@ -9,7 +9,7 @@ public class UserTest1
     {
         Assert.True(true);
     }
-    
+
     [Fact]
     public async void PasswordCreateAndValidate()
     {

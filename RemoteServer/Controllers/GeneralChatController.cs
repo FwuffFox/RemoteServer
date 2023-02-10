@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RemoteServer.Models;
 using RemoteServer.Models.DbContexts;
 
 namespace RemoteServer.Controllers;
@@ -13,15 +12,15 @@ public class GeneralChatController : ControllerBase
     {
         _context = context;
     }
-    
+
     [HttpGet("{amount:int}")]
-    public async Task<ActionResult< List<PublicMessage> >> GetLastMessages(int amount)
+    public async Task<ActionResult<List<PublicMessage>>> GetLastMessages(int amount)
     {
         var result = await Task.Run(() =>
             _context.PublicMessages
-            .Include(m => m.Sender)
-            .OrderByDescending(x => x.Id)
-            .Take(amount));
+                .Include(m => m.Sender)
+                .OrderByDescending(x => x.Id)
+                .Take(amount));
         return Ok(result.Reverse());
     }
 }

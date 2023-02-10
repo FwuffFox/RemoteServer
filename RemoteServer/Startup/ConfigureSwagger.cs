@@ -32,13 +32,12 @@ public static class ConfigureSwagger
                         },
                         Scheme = "oauth2",
                         Name = "Bearer",
-                        In = ParameterLocation.Header,
-
+                        In = ParameterLocation.Header
                     },
                     new List<string>()
                 }
             });
-            
+
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
@@ -57,6 +56,7 @@ public static class ConfigureSwagger
                 op.RoutePrefix = string.Empty;
             });
         }
+
         return app;
     }
 }

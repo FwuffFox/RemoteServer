@@ -1,4 +1,3 @@
-using Microsoft.VisualBasic;
 using RemoteServer.Models.DbContexts;
 
 namespace RemoteServer.Repositories;
@@ -6,12 +5,15 @@ namespace RemoteServer.Repositories;
 public class ChatMessagesRepository
 {
     private readonly MessengerContext _context;
+    private readonly ILogger<ChatMessagesRepository> _logger;
     private readonly UserRepository _userRepository;
 
-    public ChatMessagesRepository(MessengerContext context, UserRepository userRepository)
+    public ChatMessagesRepository(MessengerContext context, UserRepository userRepository,
+        ILogger<ChatMessagesRepository> logger)
     {
         _context = context;
         _userRepository = userRepository;
+        _logger = logger;
     }
 
     public async Task<ChatMessage> SaveChatMessageAsync(ChatMessage message)
@@ -21,22 +23,20 @@ public class ChatMessagesRepository
         return message;
     }
 
-    public IOrderedQueryable<ChatMessage> GetChatMessagesByUserId
+    public IQueryable<ChatMessage> GetChatMessagesByUserId
         (int fromUserId, int toUserId, int lastMessageId = 0)
     {
         return _context.ChatMessages
-            .Where(msg => 
-                (msg.ToUser.UserId == toUserId || msg.FromUser.UserId == toUserId) && 
-                (msg.ToUser.UserId == fromUserId || msg.FromUser.UserId == fromUserId))
-            .OrderByDescending(msg => msg.SentOn);
+            .Where(msg =>
+                (msg.ToUser.UserId == toUserId || msg.FromUser.UserId == toUserId) &&
+                (msg.ToUser.UserId == fromUserId || msg.FromUser.UserId == fromUserId));
     }
 
-    public IOrderedQueryable<ChatMessage> GetChatMessagesByUserName
+    public IQueryable<ChatMessage> GetChatMessagesByUserName
         (string fromUserName, string toUserName)
     {
         return _context.ChatMessages
-            .Where(msg => msg.FromUser.Username == fromUserName && msg.ToUser.Username == toUserName)
-            .OrderByDescending(msg => msg.SentOn);
+            .Where(msg => msg.FromUser.Username == fromUserName && msg.ToUser.Username == toUserName);
     }
 
     public async Task<ChatInfo> GetChatInfoAsync(User me, User otherUser)
@@ -56,14 +56,16 @@ public class ChatMessagesRepository
         return _context.ChatMessages
             .Where(msg => msg.FromUser == me || msg.ToUser == me)
             .OrderByDescending(message => message.SentOn)
-            .Select(msg => msg.FromUser != me ? msg.FromUser : msg.ToUser)
+            .Select(msg => msg.FromUser != me ? msg.FromUser! : msg.ToUser!)
             .Distinct();
     }
 
     public async Task<List<ChatInfo>> GetAllUserChats(User me)
     {
         var contacts = await GetAllUserContacts(me).ToListAsync();
-        var tasks  = contacts.Select(async contact => await GetChatInfoAsync(me, contact));
+        contacts = contacts.DistinctBy(user => user.Username).ToList();
+        _logger.LogInformation($"Found contacts for {me.Username}: {contacts.Count}");
+        var tasks = contacts.Select(async contact => await GetChatInfoAsync(me, contact));
         var chatInfos = await Task.WhenAll(tasks);
         return chatInfos.ToList();
     }

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using RemoteServer.Models.Shared;
-using RemoteServer.Util;
-using RemoteServer.Repositories;
 using RemoteServer.Services;
 
 namespace RemoteServer.Controllers.Authentication;
@@ -14,7 +12,8 @@ public class LoginController : ControllerBase
     private readonly ILogger<LoginController> _logger;
     private readonly UserRepository _userRepository;
 
-    public LoginController(ILogger<LoginController> logger, UserRepository userRepository, JwtTokenManager jwtTokenManager)
+    public LoginController(ILogger<LoginController> logger, UserRepository userRepository,
+        JwtTokenManager jwtTokenManager)
     {
         _logger = logger;
         _userRepository = userRepository;
@@ -22,19 +21,20 @@ public class LoginController : ControllerBase
     }
 
     /// <summary>
-    /// Вход
+    ///     Вход
     /// </summary>
     /// <param name="request">Данные для логина.</param>
-    /// <response code="200"> Пользователь успешно вошёл. Возращает JWT
-    /// токен для дальнейшей аутентификации</response>
+    /// <response code="200">
+    ///     Пользователь успешно вошёл. Возращает JWT
+    ///     токен для дальнейшей аутентификации
+    /// </response>
     /// <response code="400"> Пользователь не смог войти. Возращаем ошибки. </response>
     /// <remarks>
-    /// Пример запроса:
-    ///
+    ///     Пример запроса:
     ///     POST /auth/login
     ///     {
-    ///         "username": "@user",
-    ///         "password": "password"
+    ///     "username": "@user",
+    ///     "password": "password"
     ///     }
     /// </remarks>
     [HttpPost(Name = "Login")]
@@ -45,20 +45,18 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserFormDto request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
+
         var user = await _userRepository.GetUserAsync(request.Username);
         if (user is null)
-        {
             ModelState.AddModelError("username",
                 $"Пользователя {request.Username} не существует.");
-        }
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
+
         if (!await user!.IsPasswordValidAsync(request.Password))
             ModelState.AddModelError("password",
-                $"Неправильный пароль.");
+                "Неправильный пароль.");
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
+
         var token = _jwtTokenManager.IssueToken(user);
         _logger.LogInformation($"{user.Username} with id {user.UserId} have logged in.\n Token: {token}");
         return Ok(token);

@@ -11,7 +11,7 @@ public static class Extensions
         res ??= user.FindFirstValue(ClaimTypes.Name);
         return res!;
     }
-    
+
     public static async Task<string> GetUniqueNameAsync(this ClaimsPrincipal user)
     {
         return await Task.Run(() =>

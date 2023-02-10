@@ -1,30 +1,33 @@
-using RemoteServer.Models;
 using RemoteServer.Models.DbContexts;
 
 namespace RemoteServer.Repositories;
 
-public class UserRepository 
+public class UserRepository
 {
     private readonly MessengerContext _context;
     private readonly ILogger<UserRepository> _logger;
-
-    public MessengerContext Context 
-    {
-        get => _context;
-        private set => value = _context;
-    }
 
     public UserRepository(MessengerContext context, ILogger<UserRepository> logger)
     {
         _context = context;
         _logger = logger;
     }
-    
+
+    public MessengerContext Context
+    {
+        get => _context;
+        private set => value = _context;
+    }
+
     public async Task<User?> GetUserAsync(string username)
-        => await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
-    
+    {
+        return await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+    }
+
     public async Task<User?> GetUserAsync(int id)
-        => await _context.Users.FirstOrDefaultAsync(user => user.UserId == id);
+    {
+        return await _context.Users.FirstOrDefaultAsync(user => user.UserId == id);
+    }
 
     public async Task<IQueryable<User>> GetAllUsersAsync()
     {
@@ -32,7 +35,9 @@ public class UserRepository
     }
 
     public async Task<bool> IsUsernameTaken(string username)
-        => await _context.Users.AnyAsync(user => user.Username == username);
+    {
+        return await _context.Users.AnyAsync(user => user.Username == username);
+    }
 
     public async Task CreateUserAsync(User user)
     {
